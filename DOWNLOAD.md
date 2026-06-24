@@ -30,7 +30,7 @@ Inside **`backend/`** you should see: `assistant/`, `regulatory/`, `trade/`, `co
 | `backend/db.sqlite3` | Local database file |
 | `backend/media/` | Uploaded files |
 
-Live **database content** (regulatory data, embeddings) is created on the server with `seed_data` and `ingest`, not stored in Git.
+Live **database content** (regulatory data, embeddings) is created on the server with `seed_data` and `ingest` — not stored in Git. See **[deploy/DATA-SEED.md](deploy/DATA-SEED.md)** for the complete command list.
 
 ## Run from the ZIP (no git clone)
 

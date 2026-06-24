@@ -3,7 +3,7 @@
 **Portfolio:** [gilliomfrontlinedigital.com](https://gilliomfrontlinedigital.com/)  
 **Automation hub:** [Deployment-Stripe-center](https://github.com/dallas8000-ops/Deployment-Stripe-center) → [stripe-installer.gilliomfrontlinedigital.com](https://stripe-installer.gilliomfrontlinedigital.com/login)  
 **EastBridge target URL:** `https://eastbridge.gilliomfrontlinedigital.com`  
-**Railway fallback:** `https://eastbridge-production.up.railway.app`
+**Railway fallback:** `https://eastbridge-ops-production.up.railway.app`
 
 Railway runs **one web service** from `Dockerfile.railway`: nginx on `$PORT` serves React and proxies `/api/` to gunicorn. No Docker Compose on Railway.
 
@@ -74,18 +74,24 @@ After deploy:
 
 ### 5. Initialize data (first run)
 
+Full checklist: **[deploy/DATA-SEED.md](deploy/DATA-SEED.md)**
+
 ```bash
 railway login
-railway link
+railway link -p hearty-enjoyment -e production -s EastBridge-OPS
 
 railway run python manage.py seed_data
+railway run python manage.py seed_demo_org
 railway run python manage.py ingest --target all
 railway run python manage.py sync_trade_procedures --offline
 railway run python manage.py embed_evidence --force
 railway run python manage.py createsuperuser
+railway run python manage.py verify_data
 ```
 
-Use `createsuperuser` for client accounts — demo credentials are dev-only.
+Or on Windows: `.\scripts\railway-seed.ps1`
+
+`verify_data` confirms all minimum counts (countries, vendors, regulatory, trade, embeddings). Empty `/api/v1/countries/` means step 1 has not run yet.
 
 ### 6. Health check
 
@@ -104,7 +110,7 @@ Expected: `{"status":"ok","database":"ok"}`
 | Portfolio marketing | https://gilliomfrontlinedigital.com |
 | Automation / deploy hub | https://stripe-installer.gilliomfrontlinedigital.com |
 | EastBridge (production) | https://eastbridge.gilliomfrontlinedigital.com |
-| EastBridge (Railway) | https://eastbridge-production.up.railway.app |
+| EastBridge (Railway) | https://eastbridge-ops-production.up.railway.app |
 
 ---
 
