@@ -1,0 +1,10 @@
+{
+  "name": "eastbridge-ops-intelligence",
+  "private": true,
+  "description": "EastBridge Ops Intelligence — local dev launcher",
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
+    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
+    "smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/smoke-test.ps1"
+  }
+}
