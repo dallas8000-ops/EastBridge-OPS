@@ -24,6 +24,10 @@ Independent developer project: an AI-powered market-entry, compliance, trade, an
 
 ## Quick start
 
+### Downloaded the ZIP (no git clone)?
+
+See **[DOWNLOAD.md](DOWNLOAD.md)** — lists every folder in the zip (`frontend/` + `backend/` + deploy files) and how to run locally.
+
 ### One command (recommended)
 
 Runs API and UI in **this terminal only** — no extra PowerShell windows.
