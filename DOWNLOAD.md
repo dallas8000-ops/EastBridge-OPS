@@ -19,7 +19,7 @@ Inside **`frontend/src/pages/`** you should see: `OverviewPage.tsx`, `AssistantP
 
 Inside **`backend/`** you should see: `assistant/`, `regulatory/`, `trade/`, `config/`, etc.
 
-## Not in the ZIP (normal — recreated on your machine or on Railway)
+## Not in the ZIP (recreated on your machine)
 
 | Excluded | Why |
 |----------|-----|
@@ -27,10 +27,27 @@ Inside **`backend/`** you should see: `assistant/`, `regulatory/`, `trade/`, `co
 | `frontend/dist/` | Built on deploy; run `npm run build --prefix frontend` locally |
 | `.venv/` | Python virtualenv — create locally |
 | `.env` | Secrets — copy from `.env.example` |
-| `backend/db.sqlite3` | Local database file |
+| `backend/db.sqlite3` | Local database file (gitignored) |
 | `backend/media/` | Uploaded files |
 
-Live **database content** (regulatory data, embeddings) is created on the server with `seed_data` and `ingest` — not stored in Git. See **[deploy/DATA-SEED.md](deploy/DATA-SEED.md)** for the complete command list.
+## Data **is** in the ZIP (JSON files you can open)
+
+Unlike a live database dump, this repo ships **readable data files** your team can browse in the zip:
+
+```
+backend/fixtures/
+  initial_core.json    ← countries, data sources, industries (open in any editor)
+```
+
+After `migrate`, load them:
+
+```powershell
+python backend\manage.py load_initial_data
+```
+
+Same result as `seed_data`, but teammates **see the actual data in the repo** before running anything.
+
+For demo orgs, vendors, trade procedures, and live regulatory feeds, still run the commands in [deploy/DATA-SEED.md](deploy/DATA-SEED.md) — or ask the lead to export more `initial_*.json` fixtures after a full local setup.
 
 ## Run from the ZIP (no git clone)
 
