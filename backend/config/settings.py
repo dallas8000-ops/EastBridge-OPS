@@ -18,6 +18,10 @@ for _railway_host in (
 ):
     if _railway_host and _railway_host not in _allowed_hosts:
         _allowed_hosts.append(_railway_host)
+if os.getenv("RAILWAY_ENVIRONMENT"):
+    for _railway_suffix in ("healthcheck.railway.app", ".railway.app"):
+        if _railway_suffix not in _allowed_hosts:
+            _allowed_hosts.append(_railway_suffix)
 ALLOWED_HOSTS = _allowed_hosts
 
 INSTALLED_APPS = [
