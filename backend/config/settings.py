@@ -144,6 +144,15 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+    _ssl_redirect = os.getenv("SECURE_SSL_REDIRECT", "").lower()
+    if _ssl_redirect in ("true", "1", "yes"):
+        SECURE_SSL_REDIRECT = True
+    elif _ssl_redirect in ("false", "0", "no"):
+        SECURE_SSL_REDIRECT = False
+    elif os.getenv("RAILWAY_ENVIRONMENT"):
+        # Railway probes health over plain HTTP; redirect breaks the check (301 vs 200).
+        SECURE_SSL_REDIRECT = False
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
