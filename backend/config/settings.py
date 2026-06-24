@@ -18,10 +18,26 @@ for _railway_host in (
 ):
     if _railway_host and _railway_host not in _allowed_hosts:
         _allowed_hosts.append(_railway_host)
-if os.getenv("RAILWAY_ENVIRONMENT"):
-    for _railway_suffix in ("healthcheck.railway.app", ".railway.app"):
-        if _railway_suffix not in _allowed_hosts:
-            _allowed_hosts.append(_railway_suffix)
+
+_on_railway = any(
+    os.getenv(key, "").strip()
+    for key in (
+        "RAILWAY_ENVIRONMENT",
+        "RAILWAY_PUBLIC_DOMAIN",
+        "RAILWAY_SERVICE_ID",
+        "RAILWAY_PROJECT_ID",
+    )
+)
+if _on_railway:
+    for _railway_host in (
+        "healthcheck.railway.app",
+        ".railway.app",
+        ".railway.internal",
+        "127.0.0.1",
+        "localhost",
+    ):
+        if _railway_host not in _allowed_hosts:
+            _allowed_hosts.append(_railway_host)
 ALLOWED_HOSTS = _allowed_hosts
 
 INSTALLED_APPS = [
@@ -89,7 +105,7 @@ if DATABASE_URL.startswith("postgres"):
         "HOST": parsed.hostname or os.getenv("POSTGRES_HOST", "localhost"),
         "PORT": str(parsed.port or os.getenv("POSTGRES_PORT", "5432")),
     }
-    if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("DATABASE_SSL_REQUIRE", "").lower() in (
+    if os.getenv("RAILWAY_ENVIRONMENT") or _on_railway or os.getenv("DATABASE_SSL_REQUIRE", "").lower() in (
         "true",
         "1",
         "yes",
@@ -153,7 +169,7 @@ if not DEBUG:
         SECURE_SSL_REDIRECT = True
     elif _ssl_redirect in ("false", "0", "no"):
         SECURE_SSL_REDIRECT = False
-    elif os.getenv("RAILWAY_ENVIRONMENT"):
+    elif _on_railway:
         # Railway probes health over plain HTTP; redirect breaks the check (301 vs 200).
         SECURE_SSL_REDIRECT = False
 

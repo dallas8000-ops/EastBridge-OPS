@@ -6,3 +6,4 @@ dockerfilePath = "Dockerfile.railway"
 healthcheckPath = "/api/v1/health/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
+preDeployCommand = "python manage.py migrate --noinput"
