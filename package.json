@@ -1,10 +1,19 @@
 {
   "name": "eastbridge-ops-intelligence",
   "private": true,
-  "description": "EastBridge Ops Intelligence — local dev launcher",
+  "description": "EastBridge Ops Intelligence",
   "scripts": {
-    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
-    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
+    "dev": "npm run dev:stack",
+    "start": "npm run dev:stack",
+    "dev:stack": "concurrently --kill-others-on-fail -n api,ui -c cyan,magenta \"npm run dev:api\" \"npm run dev:ui\"",
+    "dev:api": ".venv\\Scripts\\python backend\\manage.py runserver 127.0.0.1:8888",
+    "dev:ui": "cross-env VITE_API_PROXY=http://127.0.0.1:8888 npm run dev --prefix frontend -- --port 5173 --host 127.0.0.1",
+    "prod:up": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d",
+    "prod:down": "docker compose -f docker-compose.yml -f docker-compose.prod.yml down",
     "smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/smoke-test.ps1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3"
   }
 }

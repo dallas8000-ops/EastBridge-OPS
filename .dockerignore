@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+node_modules
+frontend/node_modules
+frontend/dist
+backend/__pycache__
+backend/**/__pycache__
+backend/*.sqlite3
+backend/media
+.env
+.env.*
+*.md
+!DEPLOY-RAILWAY.md
+scripts
+.cursor
+agent-transcripts

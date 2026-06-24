@@ -26,16 +26,22 @@ Independent developer project: an AI-powered market-entry, compliance, trade, an
 
 ### One command (recommended)
 
-Starts the Django API (`:8888`), Vite UI (`:5173`), waits until both are healthy, then opens the browser.
+Runs API and UI in **this terminal only** — no extra PowerShell windows.
 
 ```powershell
-# From repo root (any of these)
-.\start.ps1
 npm run dev
-.\scripts\dev.ps1
+# or: .\start.ps1
 ```
 
-Demo login: **demo** / **demo12345**
+Press `Ctrl+C` to stop both servers.
+
+### Production / client domain
+
+See **[DEPLOY.md](DEPLOY.md)** for Docker deployment on your domain (single nginx entry point, gunicorn, no dev popups).
+
+```powershell
+npm run prod:up
+```
 
 ### First-time setup
 
@@ -250,6 +256,8 @@ docker compose up --build
 # Production-style (gunicorn + UI on :80)
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 ```
+
+**Railway (Gilliom):** see [DEPLOY-RAILWAY.md](DEPLOY-RAILWAY.md) — deploy via [Deployment-Stripe-center](https://github.com/dallas8000-ops/Deployment-Stripe-center) or manual Railway; production URL `https://eastbridge.gilliomfrontlinedigital.com`.
 
 After first Docker start:
 

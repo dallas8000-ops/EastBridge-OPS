@@ -106,8 +106,13 @@ export default function AssistantPage() {
       if (user) {
         setHistory((prev) => [result, ...prev.filter((q) => q.id !== result.id)])
       }
-    } catch {
-      setError('Assistant request failed. Check that the API is running.')
+    } catch (err) {
+      const offline = err instanceof TypeError
+      setError(
+        offline
+          ? 'Cannot reach the API. Start the backend with npm run dev or check your deployment.'
+          : 'Assistant request failed. Try again or sign in for saved history.',
+      )
     } finally {
       setLoading(false)
     }

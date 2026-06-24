@@ -10,7 +10,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-only-change-me")
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+
+_allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+for _railway_host in (
+    os.getenv("RAILWAY_PUBLIC_DOMAIN", "").strip(),
+    os.getenv("CUSTOM_DOMAIN", "").strip(),
+):
+    if _railway_host and _railway_host not in _allowed_hosts:
+        _allowed_hosts.append(_railway_host)
+ALLOWED_HOSTS = _allowed_hosts
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -69,16 +77,21 @@ if DATABASE_URL.startswith("postgres"):
     from urllib.parse import urlparse
 
     parsed = urlparse(DATABASE_URL)
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": parsed.path.lstrip("/") or os.getenv("POSTGRES_DB", "eastbridge"),
-            "USER": parsed.username or os.getenv("POSTGRES_USER", "eastbridge"),
-            "PASSWORD": parsed.password or os.getenv("POSTGRES_PASSWORD", "eastbridge"),
-            "HOST": parsed.hostname or os.getenv("POSTGRES_HOST", "localhost"),
-            "PORT": str(parsed.port or os.getenv("POSTGRES_PORT", "5432")),
-        }
+    db_config = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": parsed.path.lstrip("/") or os.getenv("POSTGRES_DB", "eastbridge"),
+        "USER": parsed.username or os.getenv("POSTGRES_USER", "eastbridge"),
+        "PASSWORD": parsed.password or os.getenv("POSTGRES_PASSWORD", "eastbridge"),
+        "HOST": parsed.hostname or os.getenv("POSTGRES_HOST", "localhost"),
+        "PORT": str(parsed.port or os.getenv("POSTGRES_PORT", "5432")),
     }
+    if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("DATABASE_SSL_REQUIRE", "").lower() in (
+        "true",
+        "1",
+        "yes",
+    ):
+        db_config["OPTIONS"] = {"sslmode": "require"}
+    DATABASES = {"default": db_config}
 else:
     DATABASES = {
         "default": {
@@ -107,9 +120,29 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
     o.strip()
-    for o in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+    for o in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
     if o.strip()
 ]
+
+_csrf_origins = [
+    o.strip()
+    for o in os.getenv(
+        "CSRF_TRUSTED_ORIGINS",
+        ",".join(CORS_ALLOWED_ORIGINS),
+    ).split(",")
+    if o.strip()
+]
+for _host in (os.getenv("RAILWAY_PUBLIC_DOMAIN", "").strip(), os.getenv("CUSTOM_DOMAIN", "").strip()):
+    if _host:
+        _origin = f"https://{_host}"
+        if _origin not in _csrf_origins:
+            _csrf_origins.append(_origin)
+CSRF_TRUSTED_ORIGINS = _csrf_origins
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

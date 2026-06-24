@@ -4,13 +4,13 @@ import { SITE_TAGLINE } from '../lib/siteCopy'
 import './Layout.css'
 const navItems = [
   { to: '/', label: 'Overview', end: true },
+  { to: '/assistant', label: 'Proof-Based Assistant' },
   { to: '/regulatory', label: 'Regulatory Changes' },
   { to: '/alerts', label: 'Change Alerts' },
   { to: '/trade', label: 'Trade Procedures' },
   { to: '/playbooks', label: 'Market Entry' },
   { to: '/vendors', label: 'Vendor Due Diligence' },
   { to: '/intelligence', label: 'Economic Intelligence' },
-  { to: '/assistant', label: 'Proof-Based Assistant' },
 ]
 
 export default function Layout() {
