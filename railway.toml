@@ -6,4 +6,5 @@ dockerfilePath = "Dockerfile.railway"
 healthcheckPath = "/api/v1/health/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
+# Optional early migrate when DATABASE_URL is wired for pre-deploy; start.sh always migrates too.
 preDeployCommand = "python manage.py migrate --noinput"

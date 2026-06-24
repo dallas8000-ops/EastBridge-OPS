@@ -5,6 +5,14 @@ PORT="${PORT:-8080}"
 # Django ALLOWED_HOSTS must accept this Host on proxied health/API requests.
 DJANGO_HOST="${RAILWAY_PUBLIC_DOMAIN:-${CUSTOM_DOMAIN:-127.0.0.1}}"
 
+# Always migrate at startup (idempotent). railway.toml preDeployCommand is an extra pass
+# when DATABASE_URL is available in the pre-deploy container — do not rely on it alone.
+python manage.py migrate --noinput
+
+if [ "${SEED_ON_DEPLOY:-false}" = "true" ]; then
+  python manage.py seed_data || true
+fi
+
 gunicorn config.wsgi:application \
   --bind 127.0.0.1:8000 \
   --workers 2 \
@@ -12,8 +20,13 @@ gunicorn config.wsgi:application \
   --access-logfile - \
   --error-logfile - &
 
-# Let gunicorn bind before nginx proxies healthchecks.
-sleep 2
+# Wait until gunicorn serves health before nginx proxies Railway's probe.
+until python -c "
+import urllib.request
+urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=2)
+" 2>/dev/null; do
+  sleep 1
+done
 
 cat > /etc/nginx/conf.d/default.conf <<NGINX
 server {
@@ -65,14 +78,5 @@ server {
     }
 }
 NGINX
-
-# Migrations run after the server is listening (see railway.toml preDeployCommand).
-if [ "${RUN_MIGRATE_ON_START:-false}" = "true" ]; then
-  python manage.py migrate --noinput &
-fi
-
-if [ "${SEED_ON_DEPLOY:-false}" = "true" ]; then
-  python manage.py seed_data || true
-fi
 
 exec nginx -g 'daemon off;'
