@@ -20,7 +20,7 @@ Independent developer project: an AI-powered market-entry, compliance, trade, an
 - **Frontend:** React 19 + TypeScript (Vite)
 - **Database:** PostgreSQL (SQLite for local dev without Docker)
 - **Workers:** Celery + Redis
-- **Deploy:** Docker Compose (Railway/Render ready)
+- **Deploy:** Docker Compose (Railway-ready)
 
 ## Quick start
 
