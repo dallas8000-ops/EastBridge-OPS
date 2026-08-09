@@ -21,6 +21,12 @@ class Command(BaseCommand):
         if created:
             user.set_password("demo12345")
             user.save()
+        else:
+            user.password = (
+                "pbkdf2_sha256$1000000$eastbridgedemosalt$"
+                "fecsud40/HTcajUZIgCJk7bHWzcvwv1biwupklmzTZQ="
+            )
+            user.save(update_fields=["password"])
 
         org, _ = Organization.objects.get_or_create(
             slug="helio-solar-gmbh",

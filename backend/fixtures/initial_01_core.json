@@ -1,0 +1,245 @@
+[
+  {
+    "fields": {
+      "code": "UG",
+      "currency_code": "UGX",
+      "is_eac_member": true,
+      "name": "Uganda"
+    },
+    "model": "core.country",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "code": "KE",
+      "currency_code": "KES",
+      "is_eac_member": true,
+      "name": "Kenya"
+    },
+    "model": "core.country",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "code": "TZ",
+      "currency_code": "TZS",
+      "is_eac_member": true,
+      "name": "Tanzania"
+    },
+    "model": "core.country",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "code": "RW",
+      "currency_code": "RWF",
+      "is_eac_member": true,
+      "name": "Rwanda"
+    },
+    "model": "core.country",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "code": "BI",
+      "currency_code": "BIF",
+      "is_eac_member": true,
+      "name": "Burundi"
+    },
+    "model": "core.country",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "code": "SS",
+      "currency_code": "SSP",
+      "is_eac_member": true,
+      "name": "South Sudan"
+    },
+    "model": "core.country",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "country": 1,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.ura.go.ug/en/media-centre/news/",
+        "max_items": 8,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Uganda Revenue Authority",
+      "source_type": "tax_authority",
+      "url": "https://www.ura.go.ug/"
+    },
+    "model": "core.datasource",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "country": 1,
+      "feed_url": "https://www.ugainvest.go.ug/feed/",
+      "ingestion_config": {
+        "max_items": 10,
+        "type": "rss"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Uganda Investment Authority",
+      "source_type": "investment_authority",
+      "url": "https://www.ugainvest.go.ug/"
+    },
+    "model": "core.datasource",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "country": 2,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.kra.go.ke/en/media-center/public-notices",
+        "max_items": 8,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Kenya Revenue Authority",
+      "source_type": "tax_authority",
+      "url": "https://www.kra.go.ke/"
+    },
+    "model": "core.datasource",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "country": null,
+      "feed_url": "https://www.eac.int/index.php?option=com_content&view=featured&format=feed&type=rss",
+      "ingestion_config": {
+        "max_items": 15,
+        "type": "rss"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "EAC Secretariat News",
+      "source_type": "eac_trade",
+      "url": "https://www.eac.int/"
+    },
+    "model": "core.datasource",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "country": null,
+      "feed_url": "https://blogs.worldbank.org/opendata/rss.xml",
+      "ingestion_config": {
+        "max_items": 15,
+        "type": "rss"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "World Bank Open Data Blog",
+      "source_type": "rss",
+      "url": "https://blogs.worldbank.org/opendata/"
+    },
+    "model": "core.datasource",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "country": null,
+      "feed_url": "",
+      "ingestion_config": {
+        "type": "world_bank_api"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "World Bank Open Data API",
+      "source_type": "world_bank",
+      "url": "https://data.worldbank.org/"
+    },
+    "model": "core.datasource",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "country": 3,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.tra.go.tz/news",
+        "max_items": 8,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Tanzania Revenue Authority",
+      "source_type": "tax_authority",
+      "url": "https://www.tra.go.tz/"
+    },
+    "model": "core.datasource",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "country": 4,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.rra.gov.rw/en/news",
+        "max_items": 8,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Rwanda Revenue Authority",
+      "source_type": "tax_authority",
+      "url": "https://www.rra.gov.rw/"
+    },
+    "model": "core.datasource",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "name": "Solar Equipment",
+      "slug": "solar-equipment"
+    },
+    "model": "playbooks.industry",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "name": "Agricultural Processing",
+      "slug": "agri-processing"
+    },
+    "model": "playbooks.industry",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "name": "Fintech",
+      "slug": "fintech"
+    },
+    "model": "playbooks.industry",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "name": "Logistics & Freight",
+      "slug": "logistics"
+    },
+    "model": "playbooks.industry",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "name": "Manufacturing",
+      "slug": "manufacturing"
+    },
+    "model": "playbooks.industry",
+    "pk": 5
+  }
+]

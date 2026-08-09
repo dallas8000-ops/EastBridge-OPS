@@ -28,6 +28,17 @@ Independent developer project: an AI-powered market-entry, compliance, trade, an
 
 See **[DOWNLOAD.md](DOWNLOAD.md)** — lists every folder in the zip (`frontend/` + `backend/` + deploy files) and how to run locally.
 
+### Sharing the repo (GitHub zip includes app data)
+
+Committed JSON under **`backend/fixtures/`** is the app image in every zip download. Before you push:
+
+```powershell
+npm run export:fixtures    # refresh fixtures from the canonical dataset
+npm run hooks:install      # optional: auto-refresh fixtures before each push
+```
+
+CI verifies fixtures stay in sync on every push to `main`.
+
 ### One command (recommended)
 
 Runs API and UI in **this terminal only** — no extra PowerShell windows.
@@ -56,9 +67,8 @@ python -m venv .venv
 pip install -r backend/requirements.txt
 cd backend
 python manage.py migrate
-python manage.py seed_data
-python manage.py seed_demo_org
-python manage.py embed_evidence --force
+python manage.py load_initial_data
+python manage.py verify_data
 cd ../frontend
 npm install
 cd ..

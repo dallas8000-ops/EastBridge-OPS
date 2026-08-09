@@ -1,0 +1,66 @@
+{
+  "createdAt": "2026-07-05T06:16:30.043623+00:00",
+  "updatedAt": "2026-07-05T06:50:42.125496+00:00",
+  "accountId": null,
+  "products": [
+    {
+      "id": "prod_UgdnrglonWJRHJ",
+      "name": "Starter"
+    },
+    {
+      "id": "prod_UgdnxRJpOWdgQf",
+      "name": "Pro"
+    },
+    {
+      "id": "prod_UggtJaJtr8qLqv",
+      "name": "Enterprise"
+    }
+  ],
+  "prices": [
+    {
+      "id": "price_1ThJVmRxznXvj6jhqPmFSLNM",
+      "tier": "Starter",
+      "amount": 900,
+      "currency": "usd",
+      "interval": "month",
+      "trialDays": 14,
+      "features": [
+        "Core features",
+        "Email support"
+      ]
+    },
+    {
+      "id": "price_1ThJVmRxznXvj6jh2aTzRO4V",
+      "tier": "Pro",
+      "amount": 2900,
+      "currency": "usd",
+      "interval": "month",
+      "trialDays": 14,
+      "features": [
+        "Everything in Starter",
+        "Priority support",
+        "Team seats"
+      ]
+    },
+    {
+      "id": "price_1ThJVnRxznXvj6jhy8uXBJ0z",
+      "tier": "Enterprise",
+      "amount": 99000,
+      "currency": "usd",
+      "interval": "year",
+      "trialDays": 0,
+      "features": [
+        "Custom SLA",
+        "Dedicated support",
+        "SSO"
+      ]
+    }
+  ],
+  "webhookEndpoint": {
+    "id": "we_1TpjszRxznXvj6jhwQJxVhzA",
+    "url": "https://eastbridge-ops-production.up.railway.app/stripe/webhook",
+    "reused": false
+  },
+  "billingPortalConfig": null,
+  "appUrl": "https://eastbridge-ops-production.up.railway.app"
+}

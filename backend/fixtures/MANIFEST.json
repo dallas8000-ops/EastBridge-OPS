@@ -1,0 +1,71 @@
+{
+  "exported_at": "2026-01-01T00:00:00Z",
+  "description": "Committed app image for GitHub zip downloads. Regenerate with: npm run export:fixtures",
+  "files": [
+    {
+      "file": "initial_01_core.json",
+      "models": [
+        "core.country",
+        "core.datasource",
+        "playbooks.industry"
+      ],
+      "records": 19,
+      "sha256": "74808b40f758c5a668f856f1de2a6b182ee9d261d3ac23029f1b31298bd775e0"
+    },
+    {
+      "file": "initial_02_accounts.json",
+      "models": [
+        "auth.user",
+        "accounts.organization",
+        "accounts.organizationmembership"
+      ],
+      "records": 5,
+      "sha256": "4d3b107f03f7673ee222e472053379d6028b073258a0d861f606cc1bd5769b79"
+    },
+    {
+      "file": "initial_03_vendors.json",
+      "models": [
+        "vendors.vendor",
+        "vendors.vendorcontractrecord",
+        "vendors.vendorpaymentrecord"
+      ],
+      "records": 6,
+      "sha256": "4003a4f7274c5fdd53c6fd5e6da46f1feb9ae36eff4887fcc45cbdf7563a1b80"
+    },
+    {
+      "file": "initial_04_regulatory.json",
+      "models": [
+        "regulatory.regulatorychange",
+        "regulatory.changealertsubscription"
+      ],
+      "records": 4,
+      "sha256": "a9f5a78bd4fbedbfcaa83c62b1be3b764f0453c6ff5034bd61a73a1bcc183a4a"
+    },
+    {
+      "file": "initial_05_intelligence.json",
+      "models": [
+        "intelligence.economicindicator",
+        "intelligence.countryrisksnapshot"
+      ],
+      "records": 5,
+      "sha256": "8605d56d360db3719693ff19fd8aaaa1d42f321c2d13e2e7c7bc70e421882b4f"
+    },
+    {
+      "file": "initial_06_trade.json",
+      "models": [
+        "trade.tradeprocedure",
+        "trade.tradeprocedurestep"
+      ],
+      "records": 21,
+      "sha256": "3ffc059c6ea619a0fa0b329d83cfb1b4969017066ada2259df26a59579b226c0"
+    },
+    {
+      "file": "initial_07_evidence.json",
+      "models": [
+        "assistant.evidencedocument"
+      ],
+      "records": 6,
+      "sha256": "30c6e401725d0925b8be2cd6e597654e9baf9aa6f20b8e2325b99681c8f28441"
+    }
+  ]
+}

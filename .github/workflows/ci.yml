@@ -4,6 +4,9 @@ on:
   push:
     branches: [main, master]
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
 
 jobs:
   backend:
@@ -26,6 +29,82 @@ jobs:
           SECRET_KEY: ci-test-secret
           DATABASE_URL: ""
         run: python manage.py check
+
+      - name: Migration smoke test
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-test-secret
+          DATABASE_URL: ""
+        run: |
+          python manage.py makemigrations --check --dry-run
+          python manage.py migrate --noinput
+
+      - name: Run full test suite with coverage report
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-test-secret
+          DATABASE_URL: ""
+          EMBEDDING_PROVIDER: hash
+        run: |
+          coverage run manage.py test
+          coverage report
+
+  backend-strict-nightly:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run strict backend gate
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-test-secret
+          DATABASE_URL: ""
+          EMBEDDING_PROVIDER: hash
+        run: |
+          coverage run manage.py test
+          coverage report --fail-under=89
+
+  fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Verify committed fixtures match app image
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-test-secret
+          DATABASE_URL: ""
+          EMBEDDING_PROVIDER: hash
+        run: python manage.py export_app_data --check
+
+      - name: Load fixtures and verify dataset
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-test-secret
+          DATABASE_URL: ""
+        run: |
+          python manage.py migrate --noinput
+          python manage.py load_initial_data
+          python manage.py verify_data
 
   frontend:
     runs-on: ubuntu-latest

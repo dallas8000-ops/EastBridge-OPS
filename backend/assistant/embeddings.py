@@ -10,6 +10,7 @@ Configure via environment:
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import math
 import re
@@ -69,18 +70,24 @@ def _tokenize(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]{3,}", text.lower())
 
 
+def _stable_bucket(value: str, dim: int) -> int:
+    """Deterministic bucket (stable across processes for fixture exports)."""
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()
+    return int(digest[:8], 16) % dim
+
+
 def _embed_hash(text: str, dim: int = EMBEDDING_DIM) -> list[float]:
     vec = [0.0] * dim
     if not text.strip():
         return vec
 
     for token in _tokenize(text):
-        vec[hash(token) % dim] += 1.0
+        vec[_stable_bucket(token, dim)] += 1.0
 
     for i in range(len(text) - 2):
         tri = text[i : i + 3].lower()
         if tri.isalnum():
-            vec[hash(tri) % dim] += 0.3
+            vec[_stable_bucket(tri, dim)] += 0.3
 
     norm = math.sqrt(sum(v * v for v in vec))
     if norm > 0:

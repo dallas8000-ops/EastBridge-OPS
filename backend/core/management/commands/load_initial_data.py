@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = "Load initial data from backend/fixtures/*.json (visible in the repo zip)."
 
     def handle(self, *args, **options):
-        fixtures_dir = Path(__file__).resolve().parents[2] / "fixtures"
+        fixtures_dir = Path(__file__).resolve().parents[3] / "fixtures"
         files = sorted(fixtures_dir.glob("initial_*.json"))
         if not files:
             self.stderr.write("No backend/fixtures/initial_*.json files found.")

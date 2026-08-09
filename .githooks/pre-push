@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refresh committed fixtures so every push ships the app data image in GitHub zips.
+exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/pre-push-export.ps1

@@ -1,0 +1,60 @@
+[
+  {
+    "fields": {
+      "created_at": "2026-01-01T00:00:00Z",
+      "name": "Helio Solar GmbH",
+      "origin_country": "DE",
+      "slug": "helio-solar-gmbh"
+    },
+    "model": "accounts.organization",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "created_at": "2026-01-01T00:00:00Z",
+      "name": "NordWind Energy AG",
+      "origin_country": "DE",
+      "slug": "nordwind-energy-ag"
+    },
+    "model": "accounts.organization",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "joined_at": "2026-01-01T00:00:00Z",
+      "organization": 1,
+      "role": "admin",
+      "user": 1
+    },
+    "model": "accounts.organizationmembership",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "joined_at": "2026-01-01T00:00:00Z",
+      "organization": 2,
+      "role": "member",
+      "user": 1
+    },
+    "model": "accounts.organizationmembership",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "date_joined": "2026-01-01T00:00:00Z",
+      "email": "demo@example.com",
+      "first_name": "",
+      "groups": [],
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": false,
+      "last_login": null,
+      "last_name": "",
+      "password": "pbkdf2_sha256$1000000$eastbridgedemosalt$fecsud40/HTcajUZIgCJk7bHWzcvwv1biwupklmzTZQ=",
+      "user_permissions": [],
+      "username": "demo"
+    },
+    "model": "auth.user",
+    "pk": 1
+  }
+]

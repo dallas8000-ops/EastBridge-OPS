@@ -1,0 +1,94 @@
+[
+  {
+    "fields": {
+      "business_profile": "Local EPC contractor for commercial solar installations.",
+      "country": 1,
+      "created_at": "2026-01-01T00:00:00Z",
+      "name": "Kampala Solar Installers Ltd",
+      "organization": 1,
+      "red_flags": [],
+      "registration_number": "UG-REG-88421",
+      "risk_score": "42.50",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "verification_status": "in_review"
+    },
+    "model": "vendors.vendor",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "business_profile": "Customs clearing and logistics for equipment imports.",
+      "country": 1,
+      "created_at": "2026-01-01T00:00:00Z",
+      "name": "East Africa Freight Solutions",
+      "organization": 1,
+      "red_flags": [
+        "Late payment on prior contract (2024)"
+      ],
+      "registration_number": "UG-REG-55210",
+      "risk_score": "58.00",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "verification_status": "pending"
+    },
+    "model": "vendors.vendor",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "business_profile": "Grid connection and utility liaison for renewable projects.",
+      "country": 2,
+      "created_at": "2026-01-01T00:00:00Z",
+      "name": "Nairobi Grid Services Ltd",
+      "organization": 2,
+      "red_flags": [],
+      "registration_number": "KE-REG-44102",
+      "risk_score": "28.00",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "verification_status": "verified"
+    },
+    "model": "vendors.vendor",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "business_profile": "Port clearance and bonded warehouse logistics.",
+      "country": 2,
+      "created_at": "2026-01-01T00:00:00Z",
+      "name": "Mombasa Customs Brokers",
+      "organization": 2,
+      "red_flags": [
+        "URA watchlist match (2024)",
+        "Incomplete tax clearance"
+      ],
+      "registration_number": "KE-REG-22981",
+      "risk_score": "71.50",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "verification_status": "flagged"
+    },
+    "model": "vendors.vendor",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "contract_ref": "HELIOS-UG-2025-01",
+      "end_date": "2026-02-28",
+      "notes": "Turnkey 500kW commercial rooftop installation.",
+      "start_date": "2025-03-01",
+      "value_usd": "125000.00",
+      "vendor": 1
+    },
+    "model": "vendors.vendorcontractrecord",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "amount_usd": "37500.00",
+      "notes": "30% mobilization payment",
+      "payment_date": "2025-04-15",
+      "status": "completed",
+      "vendor": 1
+    },
+    "model": "vendors.vendorpaymentrecord",
+    "pk": 1
+  }
+]

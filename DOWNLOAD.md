@@ -30,24 +30,32 @@ Inside **`backend/`** you should see: `assistant/`, `regulatory/`, `trade/`, `co
 | `backend/db.sqlite3` | Local database file (gitignored) |
 | `backend/media/` | Uploaded files |
 
-## Data **is** in the ZIP (JSON files you can open)
+## Data **is** in the ZIP (full app image)
 
-Unlike a live database dump, this repo ships **readable data files** your team can browse in the zip:
+Every push updates committed JSON under `backend/fixtures/` — your team sees the **same picture as the running app**:
 
 ```
 backend/fixtures/
-  initial_core.json    ← countries, data sources, industries (open in any editor)
+  initial_01_core.json         countries, sources, industries
+  initial_02_accounts.json       demo orgs and login
+  initial_03_vendors.json        vendor due diligence
+  initial_04_regulatory.json     regulatory feed samples
+  initial_05_intelligence.json   economic indicators + risk
+  initial_06_trade.json          trade procedures
+  initial_07_evidence.json       AI assistant source documents
+  MANIFEST.json                  checksums (CI verifies on push)
 ```
 
-After `migrate`, load them:
+After `migrate`, load everything:
 
 ```powershell
 python backend\manage.py load_initial_data
+python backend\manage.py verify_data
 ```
 
-Same result as `seed_data`, but teammates **see the actual data in the repo** before running anything.
+Open any `initial_*.json` in Notepad or VS Code — no server required.
 
-For demo orgs, vendors, trade procedures, and live regulatory feeds, still run the commands in [deploy/DATA-SEED.md](deploy/DATA-SEED.md) — or ask the lead to export more `initial_*.json` fixtures after a full local setup.
+For **live** regulatory RSS updates on a server, still run [deploy/DATA-SEED.md](deploy/DATA-SEED.md) ingest on Railway. The zip carries the offline snapshot; production can refresh from the network.
 
 ## Run from the ZIP (no git clone)
 
@@ -59,7 +67,8 @@ python -m venv .venv
 npm install
 cd backend
 ..\.venv\Scripts\python manage.py migrate
-..\.venv\Scripts\python manage.py seed_data
+..\.venv\Scripts\python manage.py load_initial_data
+..\.venv\Scripts\python manage.py verify_data
 cd ..
 npm run dev
 ```

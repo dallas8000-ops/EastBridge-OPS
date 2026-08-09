@@ -1,0 +1,18 @@
+[run]
+branch = True
+source = .
+omit =
+    */migrations/*
+    */tests.py
+    */management/*
+    */admin.py
+    */apps.py
+    manage.py
+    smoke_test.py
+    config/wsgi.py
+    config/asgi.py
+
+[report]
+skip_covered = False
+show_missing = True
+precision = 2

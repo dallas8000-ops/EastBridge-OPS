@@ -9,7 +9,7 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-only-change-me")
-DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
+DEBUG = os.getenv("DEBUG", "False" if any(os.getenv(k, "").strip() for k in ("RAILWAY_ENVIRONMENT", "RAILWAY_PUBLIC_DOMAIN", "RAILWAY_SERVICE_ID", "RAILWAY_PROJECT_ID")) else "True").lower() in ("true", "1", "yes")
 
 _allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
 for _railway_host in (

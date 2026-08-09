@@ -1,0 +1,343 @@
+[
+  {
+    "fields": {
+      "activity_type": "import",
+      "country": 1,
+      "estimated_cost": "Variable duties and fees",
+      "estimated_days": 5,
+      "external_id": "UG-import-goods-commercial",
+      "last_synced_at": "2026-01-01T00:00:00Z",
+      "slug": "import-goods-commercial",
+      "source_portal": "Uganda Trade Portal",
+      "source_url": "https://www.ura.go.ug/en/e-services/efris/",
+      "summary": "Standard commercial import procedure via Uganda Revenue Authority customs and URA e-services.",
+      "title": "Import goods for commercial purposes"
+    },
+    "model": "trade.tradeprocedure",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "activity_type": "import",
+      "country": 2,
+      "estimated_cost": "Variable duties and IDF fees",
+      "estimated_days": 4,
+      "external_id": "KE-import-commercial-goods",
+      "last_synced_at": "2026-01-01T00:00:00Z",
+      "slug": "import-commercial-goods",
+      "source_portal": "Kenya Trade Portal",
+      "source_url": "https://kenyatradeportal.go.ke/",
+      "summary": "Kenya import procedure via KRA customs and the Kenya Trade Information Portal.",
+      "title": "Import commercial goods"
+    },
+    "model": "trade.tradeprocedure",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "activity_type": "import",
+      "country": 3,
+      "estimated_cost": "Variable duties",
+      "estimated_days": 6,
+      "external_id": "TZ-import-goods",
+      "last_synced_at": "2026-01-01T00:00:00Z",
+      "slug": "import-goods",
+      "source_portal": "Tanzania Trade Portal",
+      "source_url": "https://www.tra.go.tz/",
+      "summary": "Tanzania import procedure via Tanzania Revenue Authority customs.",
+      "title": "Import goods into Tanzania"
+    },
+    "model": "trade.tradeprocedure",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "activity_type": "import",
+      "country": 4,
+      "estimated_cost": "Variable duties",
+      "estimated_days": 3,
+      "external_id": "RW-import-clearance",
+      "last_synced_at": "2026-01-01T00:00:00Z",
+      "slug": "import-clearance",
+      "source_portal": "Rwanda Trade Portal",
+      "source_url": "https://www.rra.gov.rw/",
+      "summary": "Rwanda import procedure via Rwanda Revenue Authority and Rwanda Trade Portal.",
+      "title": "Import clearance in Rwanda"
+    },
+    "model": "trade.tradeprocedure",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "description": "Register with URA and obtain a Tax Identification Number before importing.",
+      "documents_required": [
+        "TIN certificate",
+        "Company registration"
+      ],
+      "estimated_days": null,
+      "procedure": 1,
+      "responsible_agency": "Uganda Revenue Authority (URA)",
+      "sort_order": 0,
+      "title": "Obtain TIN and register importer"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "description": "Commercial invoice, packing list, bill of lading/airway bill, and certificate of origin.",
+      "documents_required": [
+        "Commercial invoice",
+        "Packing list",
+        "Bill of lading"
+      ],
+      "estimated_days": null,
+      "procedure": 1,
+      "responsible_agency": "Exporter / Freight forwarder",
+      "sort_order": 1,
+      "title": "Prepare shipping documentation"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "description": "Submit import declaration through ASYCUDA World via licensed clearing agent.",
+      "documents_required": [
+        "Import declaration",
+        "HS classification",
+        "Import license if required"
+      ],
+      "estimated_days": null,
+      "procedure": 1,
+      "responsible_agency": "URA Customs",
+      "sort_order": 2,
+      "title": "Customs declaration (ASYCUDA)"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "description": "Pay import duty, VAT, and any excise at customs before release.",
+      "documents_required": [
+        "Payment receipt"
+      ],
+      "estimated_days": null,
+      "procedure": 1,
+      "responsible_agency": "URA",
+      "sort_order": 3,
+      "title": "Pay duties and taxes"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "description": "Goods released after inspection and payment confirmation.",
+      "documents_required": [
+        "Release order"
+      ],
+      "estimated_days": null,
+      "procedure": 1,
+      "responsible_agency": "URA Customs / Warehouse operator",
+      "sort_order": 4,
+      "title": "Release and delivery"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "description": "Register with Kenya Revenue Authority and obtain a PIN for import transactions.",
+      "documents_required": [
+        "KRA PIN certificate",
+        "Company registration"
+      ],
+      "estimated_days": null,
+      "procedure": 2,
+      "responsible_agency": "Kenya Revenue Authority (KRA)",
+      "sort_order": 0,
+      "title": "Obtain KRA PIN"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "description": "Apply for IDF through Kenya TradeNet before shipment arrival.",
+      "documents_required": [
+        "Pro forma invoice",
+        "IDF application"
+      ],
+      "estimated_days": null,
+      "procedure": 2,
+      "responsible_agency": "Kenya Revenue Authority",
+      "sort_order": 1,
+      "title": "Get Import Declaration Form (IDF)"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "description": "Clearing agent files entry in Integrated Customs Management System.",
+      "documents_required": [
+        "Bill of lading",
+        "Commercial invoice",
+        "Packing list",
+        "IDF"
+      ],
+      "estimated_days": null,
+      "procedure": 2,
+      "responsible_agency": "KRA Customs",
+      "sort_order": 2,
+      "title": "Customs clearance (iCMS)"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "description": "Pay import duty, VAT, and levies; obtain release after inspection if required.",
+      "documents_required": [
+        "Payment confirmation"
+      ],
+      "estimated_days": null,
+      "procedure": 2,
+      "responsible_agency": "KRA",
+      "sort_order": 3,
+      "title": "Pay duties and release"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "description": "Obtain TIN and importer registration with Tanzania Revenue Authority.",
+      "documents_required": [
+        "TIN",
+        "Business licence"
+      ],
+      "estimated_days": null,
+      "procedure": 3,
+      "responsible_agency": "TRA",
+      "sort_order": 0,
+      "title": "Register with TRA"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "description": "Prepare invoice, packing list, transport document, and permits for regulated goods.",
+      "documents_required": [
+        "Commercial invoice",
+        "Packing list",
+        "Bill of lading"
+      ],
+      "estimated_days": null,
+      "procedure": 3,
+      "responsible_agency": "Importer",
+      "sort_order": 1,
+      "title": "Pre-arrival documentation"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "description": "File import declaration in TANCIS through licensed clearing agent.",
+      "documents_required": [
+        "Customs declaration",
+        "TIN",
+        "Permits if applicable"
+      ],
+      "estimated_days": null,
+      "procedure": 3,
+      "responsible_agency": "TRA Customs",
+      "sort_order": 2,
+      "title": "Customs declaration (TANCIS)"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "description": "Pay import duty, VAT, and excise where applicable.",
+      "documents_required": [
+        "Payment receipt"
+      ],
+      "estimated_days": null,
+      "procedure": 3,
+      "responsible_agency": "TRA",
+      "sort_order": 3,
+      "title": "Assessment and payment"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "description": "Register business and obtain TIN from Rwanda Revenue Authority.",
+      "documents_required": [
+        "TIN",
+        "RDB registration"
+      ],
+      "estimated_days": null,
+      "procedure": 4,
+      "responsible_agency": "RRA",
+      "sort_order": 0,
+      "title": "RRA registration"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "description": "Provide invoice, transport document, and certificates through clearing agent.",
+      "documents_required": [
+        "Invoice",
+        "Packing list",
+        "Bill of lading"
+      ],
+      "estimated_days": null,
+      "procedure": 4,
+      "responsible_agency": "Licensed clearing agent",
+      "sort_order": 1,
+      "title": "Submit import documentation"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "description": "Declaration filed in Rwanda Electronic Single Window (ReSW).",
+      "documents_required": [
+        "Customs declaration"
+      ],
+      "estimated_days": null,
+      "procedure": 4,
+      "responsible_agency": "RRA Customs",
+      "sort_order": 2,
+      "title": "Customs processing (ReSW)"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 16
+  },
+  {
+    "fields": {
+      "description": "Pay duties and taxes; goods released upon compliance.",
+      "documents_required": [
+        "Payment proof"
+      ],
+      "estimated_days": null,
+      "procedure": 4,
+      "responsible_agency": "RRA",
+      "sort_order": 3,
+      "title": "Pay and release"
+    },
+    "model": "trade.tradeprocedurestep",
+    "pk": 17
+  }
+]
