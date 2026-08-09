@@ -72,7 +72,7 @@ jobs:
           EMBEDDING_PROVIDER: hash
         run: |
           coverage run manage.py test
-          coverage report --fail-under=89
+          coverage report --fail-under=90
 
   fixtures:
     runs-on: ubuntu-latest
