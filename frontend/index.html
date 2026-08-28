@@ -4,11 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Independent developer project helping EU companies operate in East Africa with cited regulatory, trade, and vendor intelligence." />
+    <meta name="description" content="EastBridge Ops Intelligence gives EU companies cited regulatory, trade, and vendor intelligence for operating in East Africa." />
     <title>EastBridge Ops Intelligence</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static fallback: React replaces this on mount. Search engines and no-JS
+           visitors see this instead of a blank page. -->
+      <main style="font-family: system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1.5rem; color: #1a1a1a;">
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">EastBridge Ops Intelligence</h1>
+        <p style="font-size: 1.05rem; line-height: 1.6;">Cited regulatory, trade, and vendor intelligence to help EU companies operate in East Africa.</p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
