@@ -93,6 +93,19 @@ Or on Windows: `.\scripts\railway-seed.ps1`
 
 `verify_data` confirms all minimum counts (countries, vendors, regulatory, trade, embeddings). Empty `/api/v1/countries/` means step 1 has not run yet.
 
+For an automated first deployment, temporarily set `INITIALIZE_DEMO_DATA=true` on the web service. Startup runs the idempotent `initialize_demo_data` command, which loads the committed fixture snapshot only when required records are missing and always runs `verify_data`. After one verified deployment, set the variable back to `false`.
+
+### 6. Run scheduled ingestion
+
+The web process does not run Celery schedules. Create two additional Railway services from the same repository and Docker image, with the same `DATABASE_URL`, Redis connection variables, and application environment:
+
+| Service | Start command | Purpose |
+| --- | --- | --- |
+| `EastBridge-worker` | `/worker.sh` | Executes ingestion, trade-sync, embedding, and other queued tasks |
+| `EastBridge-beat` | `/beat.sh` | Publishes the schedules defined in `CELERY_BEAT_SCHEDULE` |
+
+Keep exactly one Beat service to avoid duplicate scheduled jobs. After deployment, request `/api/v1/ingestion/status/` and verify nonzero evidence, regulatory, economic, and trade counts plus advancing last-run timestamps.
+
 ### 6. Health check
 
 ```bash

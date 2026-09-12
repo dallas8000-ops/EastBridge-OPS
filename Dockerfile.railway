@@ -32,7 +32,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ .
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
 COPY deploy/railway/start.sh /start.sh
-RUN chmod +x /start.sh && mkdir -p /app/media
+COPY deploy/railway/worker.sh /worker.sh
+COPY deploy/railway/beat.sh /beat.sh
+RUN chmod +x /start.sh /worker.sh /beat.sh && mkdir -p /app/media
 
 EXPOSE 8080
 

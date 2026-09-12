@@ -48,9 +48,11 @@ Open the app (not the DRF browsable API): https://eastbridge-ops-production.up.r
 
 ---
 
-## Optional: seed on deploy
+## Optional: initialize on deploy
 
-Railway variable `SEED_ON_DEPLOY=true` runs **only** `seed_data` on container start. It does **not** replace the full sequence above. Set once, redeploy, then set back to `false`.
+Railway variable `INITIALIZE_DEMO_DATA=true` runs the idempotent `initialize_demo_data` command on web-container startup. It loads the committed fixture snapshot and embeds evidence only when required records are missing, then runs `verify_data`. Set it for one deployment, confirm the status counts below, then set it back to `false`.
+
+Recurring refreshes require separate Railway services using `/worker.sh` and `/beat.sh`; the Gunicorn/nginx web service does not execute Celery Beat.
 
 ---
 

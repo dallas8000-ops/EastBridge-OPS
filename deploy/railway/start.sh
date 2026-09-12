@@ -9,8 +9,8 @@ DJANGO_HOST="${RAILWAY_PUBLIC_DOMAIN:-${CUSTOM_DOMAIN:-127.0.0.1}}"
 # when DATABASE_URL is available in the pre-deploy container — do not rely on it alone.
 python manage.py migrate --noinput
 
-if [ "${SEED_ON_DEPLOY:-false}" = "true" ]; then
-  python manage.py seed_data || true
+if [ "${INITIALIZE_DEMO_DATA:-false}" = "true" ]; then
+  python manage.py initialize_demo_data
 fi
 
 gunicorn config.wsgi:application \
