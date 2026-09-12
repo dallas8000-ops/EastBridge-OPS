@@ -14,3 +14,4 @@ lxml>=6.0,<7
 numpy>=2.0,<3
 fastembed>=0.5,<0.8
 gunicorn>=23.0,<24
+sentry-sdk>=2.0,<3

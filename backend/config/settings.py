@@ -8,6 +8,17 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN", ""),
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=0.1,     # perf monitoring sample rate
+    send_default_pii=False,     # don't leak user PII into Sentry — matches your security posture
+    environment=os.environ.get("SENTRY_ENVIRONMENT", "production"),
+)
+
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-only-change-me")
 DEBUG = os.getenv("DEBUG", "False" if any(os.getenv(k, "").strip() for k in ("RAILWAY_ENVIRONMENT", "RAILWAY_PUBLIC_DOMAIN", "RAILWAY_SERVICE_ID", "RAILWAY_PROJECT_ID")) else "True").lower() in ("true", "1", "yes")
 
