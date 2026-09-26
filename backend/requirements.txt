@@ -15,4 +15,4 @@ numpy>=2.0,<3
 fastembed>=0.5,<0.8
 gunicorn>=23.0,<24
 sentry-sdk>=2.0,<3
-PyPDF2>=3.0,<4
+pypdf>=4.0,<6

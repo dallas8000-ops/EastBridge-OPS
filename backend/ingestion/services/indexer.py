@@ -5,7 +5,7 @@ from django.utils import timezone
 from assistant.models import EvidenceDocument
 from core.models import DataSource
 from ingestion.fetchers.base import FetchedItem, content_hash
-from ingestion.fetchers.pdf import fetch_gazette_notices, fetch_pdf_list
+from ingestion.fetchers.pdf import PDF_LINK_SELECTOR, fetch_gazette_notices, fetch_pdf_list
 from ingestion.fetchers.rss import fetch_html_list, fetch_rss
 from ingestion.fetchers.world_bank import fetch_world_bank_as_items
 from ingestion.models import IngestedItem, IngestionRun
@@ -74,7 +74,7 @@ def fetch_from_source(source: DataSource) -> list[FetchedItem]:
     if ingest_type == "pdf_list":
         return fetch_pdf_list(
             list_url=config.get("list_url", source.url),
-            pdf_link_selector=config.get("pdf_link_selector", "a[href$='.pdf']"),
+            pdf_link_selector=config.get("pdf_link_selector", PDF_LINK_SELECTOR),
             max_items=config.get("max_items", 10),
             base_url=config.get("base_url", source.url),
         )

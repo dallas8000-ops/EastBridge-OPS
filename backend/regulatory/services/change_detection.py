@@ -135,8 +135,8 @@ def analyze_regulatory_trends(days: int = 30) -> dict:
     """Analyze regulatory trends over time."""
     cutoff = timezone.now() - timedelta(days=days)
     
-    changes = RegulatoryChange.objects.filter(detected_at__gte=cutoff)
-    
+    changes = RegulatoryChange.objects.filter(detected_at__gte=cutoff).select_related("country", "source")
+
     # Category breakdown
     category_breakdown = {}
     for change in changes:
@@ -164,7 +164,7 @@ def analyze_regulatory_trends(days: int = 30) -> dict:
     # Source activity
     source_activity = {}
     for change in changes:
-        source = change.source.name
+        source = change.source.name if change.source else "unknown"
         if source not in source_activity:
             source_activity[source] = 0
         source_activity[source] += 1

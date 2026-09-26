@@ -2,7 +2,8 @@
 
 import logging
 import re
-from urllib.parse import urljoin
+from io import BytesIO
+from urllib.parse import urljoin, urlparse
 
 import httpx
 from bs4 import BeautifulSoup
@@ -12,6 +13,8 @@ from .base import FetchedItem
 logger = logging.getLogger(__name__)
 
 USER_AGENT = "EastBridge-Ops-Intelligence/1.0 (+https://github.com/eastbridge; compliance monitoring)"
+
+PDF_LINK_SELECTOR = "a[href$='.pdf' i]"
 
 
 def _http_get(url: str, timeout: float = 30.0) -> bytes:
@@ -25,100 +28,78 @@ def _extract_text_from_pdf_url(pdf_url: str) -> str:
     """Extract text from a PDF URL using available libraries."""
     try:
         pdf_content = _http_get(pdf_url)
-        
-        # Try PyPDF2 first
-        try:
-            import PyPDF2
-            from io import BytesIO
-            
-            pdf_file = BytesIO(pdf_content)
-            pdf_reader = PyPDF2.PdfReader(pdf_file)
-            
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
-            
-            return text[:10000]  # Limit to prevent excessive processing
-            
-        except ImportError:
-            logger.warning("PyPDF2 not available, falling back to basic text extraction")
-            # Fallback: extract from URL and basic text processing
-            return _basic_pdf_extraction(pdf_url, pdf_content)
-            
+    except httpx.HTTPError as exc:
+        logger.warning("Failed to download PDF %s: %s", pdf_url, exc)
+        return ""
+
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        logger.warning("pypdf not available, falling back to basic text extraction")
+        return _basic_pdf_extraction(pdf_url, pdf_content)
+
+    try:
+        reader = PdfReader(BytesIO(pdf_content))
+        text = "\n".join(page.extract_text() or "" for page in reader.pages)
     except Exception as exc:
         logger.warning("Failed to extract text from PDF %s: %s", pdf_url, exc)
         return ""
+    return text[:10000]  # Limit to prevent excessive processing
 
 
 def _basic_pdf_extraction(pdf_url: str, content: bytes) -> str:
     """Basic text extraction when PDF libraries are unavailable."""
-    # This is a fallback - extract what we can from the filename and URL
-    filename = pdf_url.split("/")[-1]
-    filename = re.sub(r"[._-]", " ", filename)
+    filename = urlparse(pdf_url).path.rsplit("/", 1)[-1]
     filename = re.sub(r"\.pdf$", "", filename, flags=re.IGNORECASE)
-    
-    # Try to extract some readable text from the PDF content
-    try:
-        # Simple extraction of printable ASCII text
-        text = content.decode('latin-1', errors='ignore')
-        # Filter for likely text content
-        readable = re.sub(r'[^\x20-\x7E\n\r\t]', ' ', text)
-        readable = re.sub(r'\s+', ' ', readable)
-        return readable[:5000] if len(readable) > 100 else filename
-    except:
-        return filename
+    filename = re.sub(r"[._-]", " ", filename).strip()
+
+    # Simple extraction of printable ASCII text from the raw bytes
+    text = content.decode("latin-1", errors="ignore")
+    readable = re.sub(r"[^\x20-\x7E\n\r\t]", " ", text)
+    readable = re.sub(r"\s+", " ", readable).strip()
+    return readable[:5000] if len(readable) > 100 else filename
 
 
 def fetch_pdf_list(
     list_url: str,
-    pdf_link_selector: str = "a[href$='.pdf']",
+    pdf_link_selector: str = PDF_LINK_SELECTOR,
     max_items: int = 10,
     base_url: str | None = None,
 ) -> list[FetchedItem]:
     """Fetch PDF documents from a listing page."""
     try:
-        html_content = _http_get(list_url).decode('utf-8', errors='ignore')
+        html_content = _http_get(list_url).decode("utf-8", errors="ignore")
     except httpx.HTTPError as exc:
         logger.warning("Failed to fetch PDF list from %s: %s", list_url, exc)
         return []
-    
+
     soup = BeautifulSoup(html_content, "lxml")
     base = base_url or list_url
     seen_urls: set[str] = set()
     items: list[FetchedItem] = []
-    
-    # Find all PDF links
-    pdf_links = soup.select(pdf_link_selector)
-    
-    for link in pdf_links[:max_items]:
+
+    for link in soup.select(pdf_link_selector):
+        if len(items) >= max_items:
+            break
+
         href = link.get("href")
         if not href:
             continue
-            
+
         url = urljoin(base, href)
         if url in seen_urls:
             continue
         seen_urls.add(url)
-        
-        # Get link text as title
+
+        # Get link text as title, falling back to the surrounding element
         title = link.get_text(strip=True)
-        if not title or len(title) < 5:
-            # Try to get title from parent elements
-            parent = link.parent
-            if parent:
-                title = parent.get_text(strip=True)
-        
+        if len(title) < 5 and link.parent:
+            title = link.parent.get_text(strip=True)
         if not title:
             title = url.split("/")[-1]
-        
-        # Extract text from PDF
-        try:
-            pdf_text = _extract_text_from_pdf_url(url)
-            content = pdf_text if pdf_text else title
-        except Exception as exc:
-            logger.warning("Failed to process PDF %s: %s", url, exc)
-            content = title
-        
+
+        content = _extract_text_from_pdf_url(url) or title
+
         items.append(
             FetchedItem(
                 external_id=url[:512],
@@ -128,7 +109,7 @@ def fetch_pdf_list(
                 published_at=None,
             )
         )
-    
+
     return items
 
 
@@ -136,9 +117,8 @@ def fetch_gazette_notices(
     gazette_url: str,
     max_items: int = 10,
 ) -> list[FetchedItem]:
-    """Fetch Uganda Gazette notices specifically."""
+    """Fetch gazette notices (PDF links) from a gazette listing page."""
     return fetch_pdf_list(
         list_url=gazette_url,
-        pdf_link_selector="a[href*='gazette'], a[href*='Gazette'], a[href$='.pdf']",
         max_items=max_items,
     )

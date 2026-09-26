@@ -81,7 +81,7 @@ def dispatch_change_alerts(change) -> dict:
                     body,
                     settings.DEFAULT_FROM_EMAIL,
                     emails,
-                    fail_silently=True,  # Changed to fail_silently to avoid blocking
+                    fail_silently=False,
                 )
                 sent = len(emails)
             except Exception as exc:

@@ -15,7 +15,7 @@ from regulatory.models import ChangeAlertSubscription, RegulatoryChange
 from trade.models import TradeProcedure
 
 from .fetchers.base import FetchedItem
-from .fetchers import world_bank
+from .fetchers import pdf, world_bank
 from .models import IngestedItem, IngestionRun
 from .services import indexer
 from .services import retrieval
@@ -264,6 +264,14 @@ class AlertDispatchTests(TestCase):
 		self.assertEqual(result["emails_sent"], 1)
 		self.assertTrue(result["errors"])
 
+	@mock.patch("ingestion.tasks.send_mail", side_effect=RuntimeError("smtp down"))
+	def test_dispatch_change_alerts_reports_email_failure(self, _send_mail):
+		ChangeAlertSubscription.objects.create(email="a@example.com", country=self.country, category="")
+
+		result = dispatch_change_alerts(self.change)
+		self.assertEqual(result["emails_sent"], 0)
+		self.assertIn("smtp down", result["errors"])
+
 	@mock.patch("ingestion.tasks.send_mail")
 	def test_dispatch_change_alerts_no_subscribers_no_email(self, send_mail):
 		ChangeAlertSubscription.objects.all().delete()
@@ -405,6 +413,98 @@ class LegalMonitoringTaskTests(TestCase):
 		self.assertIn("trade.tasks.sync_trade_procedures_task", scheduled)
 		self.assertIn("assistant.tasks.embed_evidence_task", scheduled)
 		self.assertIn("ingestion.tasks.monitor_uganda_legal_sources", scheduled)
+
+
+class PdfFetcherTests(TestCase):
+	LISTING = b"""
+		<html><body>
+			<a href='/docs/notice-one.pdf'>Gazette Notice One</a>
+			<a href='/docs/notice-one.pdf'>Gazette Notice One</a>
+			<a href='/docs/NOTICE-TWO.PDF'>Gazette Notice Two</a>
+			<p>Ref: <a href='/docs/x.pdf'>x</a></p>
+			<a href='/gazette/archive'>Gazette archive page</a>
+		</body></html>
+	"""
+
+	def _fake_pypdf(self, pages):
+		reader = mock.Mock(pages=[mock.Mock(**{"extract_text.return_value": text}) for text in pages])
+		return SimpleNamespace(PdfReader=mock.Mock(return_value=reader))
+
+	@mock.patch("ingestion.fetchers.pdf._extract_text_from_pdf_url", return_value="")
+	@mock.patch("ingestion.fetchers.pdf._http_get")
+	def test_fetch_pdf_list_only_pdfs_deduped_up_to_limit(self, http_get, _extract):
+		http_get.return_value = self.LISTING
+
+		items = pdf.fetch_pdf_list("https://example.com/list", max_items=2)
+
+		self.assertEqual(
+			[item.url for item in items],
+			["https://example.com/docs/notice-one.pdf", "https://example.com/docs/NOTICE-TWO.PDF"],
+		)
+		self.assertEqual(items[0].content, "Gazette Notice One")
+
+	@mock.patch("ingestion.fetchers.pdf._extract_text_from_pdf_url", return_value="body text")
+	@mock.patch("ingestion.fetchers.pdf._http_get")
+	def test_fetch_gazette_notices_uses_parent_text_for_short_titles(self, http_get, _extract):
+		http_get.return_value = self.LISTING
+
+		items = pdf.fetch_gazette_notices("https://example.com/list", max_items=10)
+
+		self.assertEqual(len(items), 3)
+		self.assertEqual(items[2].title, "Ref:x")
+		self.assertEqual(items[2].content, "body text")
+
+	@mock.patch("ingestion.fetchers.pdf._http_get", side_effect=httpx.HTTPError("offline"))
+	def test_fetch_pdf_list_returns_empty_when_listing_unavailable(self, _http_get):
+		self.assertEqual(pdf.fetch_pdf_list("https://example.com/list"), [])
+
+	@mock.patch("ingestion.fetchers.pdf._http_get", return_value=b"%PDF")
+	def test_extract_text_uses_pypdf_and_tolerates_empty_pages(self, _http_get):
+		with mock.patch.dict("sys.modules", {"pypdf": self._fake_pypdf(["Page one", None])}):
+			text = pdf._extract_text_from_pdf_url("https://example.com/a.pdf")
+		self.assertEqual(text, "Page one\n")
+
+	@mock.patch("ingestion.fetchers.pdf._http_get", return_value=b"%PDF")
+	def test_extract_text_returns_empty_on_parse_error(self, _http_get):
+		broken = SimpleNamespace(PdfReader=mock.Mock(side_effect=ValueError("bad pdf")))
+		with mock.patch.dict("sys.modules", {"pypdf": broken}):
+			self.assertEqual(pdf._extract_text_from_pdf_url("https://example.com/a.pdf"), "")
+
+	@mock.patch("ingestion.fetchers.pdf._http_get", side_effect=httpx.HTTPError("404"))
+	def test_extract_text_returns_empty_on_download_error(self, _http_get):
+		self.assertEqual(pdf._extract_text_from_pdf_url("https://example.com/a.pdf"), "")
+
+	@mock.patch("ingestion.fetchers.pdf._http_get", return_value=b"x" * 150)
+	def test_extract_text_falls_back_without_pypdf(self, _http_get):
+		with mock.patch.dict("sys.modules", {"pypdf": None}):
+			text = pdf._extract_text_from_pdf_url("https://example.com/a.pdf")
+		self.assertEqual(text, "x" * 150)
+
+	def test_basic_extraction_uses_filename_for_short_content(self):
+		text = pdf._basic_pdf_extraction("https://example.com/docs/Tax_Notice-2026.PDF", b"\x00\x01")
+		self.assertEqual(text, "Tax Notice 2026")
+
+	@mock.patch("ingestion.services.indexer.fetch_gazette_notices", return_value=[])
+	@mock.patch("ingestion.services.indexer.fetch_pdf_list", return_value=[])
+	def test_fetch_from_source_dispatches_pdf_types(self, fetch_pdf_list, fetch_gazette):
+		pdf_source = DataSource.objects.create(
+			name="PDF",
+			source_type=DataSource.SourceType.JUDICIARY,
+			url="https://example.com/pdfs",
+			ingestion_config={"type": "pdf_list"},
+		)
+		gazette_source = DataSource.objects.create(
+			name="Gazette",
+			source_type=DataSource.SourceType.GAZETTE,
+			url="https://example.com/gazette",
+			ingestion_config={"type": "gazette", "max_items": 3},
+		)
+
+		indexer.fetch_from_source(pdf_source)
+		indexer.fetch_from_source(gazette_source)
+
+		fetch_pdf_list.assert_called_once()
+		fetch_gazette.assert_called_once_with(gazette_url="https://example.com/gazette", max_items=3)
 
 
 class RssFetcherTests(TestCase):
