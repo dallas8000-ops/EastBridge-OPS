@@ -19,6 +19,7 @@ from .fetchers import world_bank
 from .models import IngestedItem, IngestionRun
 from .services import indexer
 from .services import retrieval
+from . import tasks
 from .tasks import dispatch_change_alerts, run_economic_ingestion, run_regulatory_ingestion
 
 
@@ -297,6 +298,113 @@ class IngestionTaskWrapperTests(TestCase):
 
 		last = IngestionRun.objects.order_by("-id").first()
 		self.assertEqual(last.items_failed, 1)
+
+
+class LegalMonitoringTaskTests(TestCase):
+	def setUp(self):
+		self.country = Country.objects.create(code="UG", name="Uganda", is_eac_member=True)
+		self.legal = DataSource.objects.create(
+			name="ULRC",
+			source_type=DataSource.SourceType.LEGAL_REFORM,
+			url="https://example.com/ulrc",
+			country=self.country,
+			ingestion_config={"type": "html_list"},
+		)
+		self.gazette = DataSource.objects.create(
+			name="Uganda Gazette",
+			source_type=DataSource.SourceType.GAZETTE,
+			url="https://example.com/gazette",
+			country=self.country,
+			ingestion_config={"type": "gazette"},
+		)
+
+	def _ingest_creating_change(self, title):
+		def run(source):
+			RegulatoryChange.objects.create(
+				title=title,
+				summary="s",
+				business_impact="i",
+				required_action="a",
+				category=RegulatoryChange.Category.OTHER,
+				risk_level=RegulatoryChange.RiskLevel.LOW,
+				source_url=f"https://example.com/{source.pk}",
+				source=source,
+				country=self.country,
+			)
+			return {"source": source.name, "fetched": 1, "indexed": 1, "failed": 0}
+		return run
+
+	@mock.patch("ingestion.tasks.dispatch_change_alerts")
+	@mock.patch("ingestion.tasks.indexer.run_source_ingestion")
+	def test_monitor_legal_sources_alerts_on_new_changes(self, run_source, dispatch):
+		run_source.side_effect = self._ingest_creating_change("Urgent amendment notice")
+
+		result = tasks.monitor_uganda_legal_sources()
+
+		self.assertEqual(result["sources_monitored"], 2)
+		self.assertEqual(result["items_new"], 2)
+		self.assertEqual(result["items_failed"], 0)
+		self.assertEqual(dispatch.call_count, 2)
+		run = IngestionRun.objects.get(pk=result["run_id"])
+		self.assertEqual(run.items_fetched, 2)
+		self.assertEqual(len(run.summary["results"]), 2)
+
+	@mock.patch("ingestion.tasks.dispatch_change_alerts")
+	@mock.patch("assistant.tasks.embed_document")
+	def test_gazette_change_alert_carries_final_high_risk(self, _embed, dispatch):
+		alerted_levels = []
+		dispatch.side_effect = lambda change: alerted_levels.append(change.risk_level)
+		item = FetchedItem(
+			external_id="g-1",
+			title="Weekly notice",
+			url="https://example.com/g-1",
+			content="general notice",
+			published_at=None,
+		)
+
+		indexer.process_fetched_item(self.gazette, item)
+
+		change = RegulatoryChange.objects.get(source_url="https://example.com/g-1")
+		self.assertEqual(change.risk_level, RegulatoryChange.RiskLevel.HIGH)
+		self.assertEqual(alerted_levels, [RegulatoryChange.RiskLevel.HIGH])
+
+	@mock.patch("ingestion.tasks.dispatch_change_alerts")
+	@mock.patch("ingestion.tasks.indexer.run_source_ingestion", side_effect=RuntimeError("down"))
+	def test_monitor_legal_sources_records_source_failures(self, _run_source, dispatch):
+		result = tasks.monitor_uganda_legal_sources()
+
+		self.assertEqual(result["items_failed"], 2)
+		dispatch.assert_not_called()
+		run = IngestionRun.objects.get(pk=result["run_id"])
+		self.assertEqual(run.items_fetched, 0)
+
+	@mock.patch("ingestion.tasks.dispatch_change_alerts")
+	@mock.patch("ingestion.tasks.indexer.run_source_ingestion")
+	def test_monitor_gazette_alerts_on_new_notices(self, run_source, dispatch):
+		run_source.side_effect = self._ingest_creating_change("Gazette notice")
+
+		result = tasks.monitor_uganda_gazette()
+
+		self.assertEqual(result["items_new"], 1)
+		run_source.assert_called_once_with(self.gazette)
+		dispatch.assert_called_once()
+
+	def test_monitor_gazette_without_source_reports_error(self):
+		result = tasks.monitor_kenya_gazette()
+		self.assertIn("error", result)
+
+	def test_daily_health_check_returns_report(self):
+		report = tasks.daily_health_check()
+		self.assertIn("stale_sources", report)
+		self.assertIn("deleted_runs", report)
+
+	def test_beat_schedule_keeps_existing_and_new_tasks(self):
+		from config.celery import app
+
+		scheduled = {entry["task"] for entry in app.conf.beat_schedule.values()}
+		self.assertIn("trade.tasks.sync_trade_procedures_task", scheduled)
+		self.assertIn("assistant.tasks.embed_evidence_task", scheduled)
+		self.assertIn("ingestion.tasks.monitor_uganda_legal_sources", scheduled)
 
 
 class RssFetcherTests(TestCase):

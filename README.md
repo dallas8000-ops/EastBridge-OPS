@@ -8,11 +8,63 @@ Independent developer project: an AI-powered market-entry, compliance, trade, an
 
 | Module | Purpose |
 |--------|---------|
-| **Regulatory Change Engine** | Monitors tax, customs, investment, EAC trade, data protection, and labor updates with source URLs, impact summaries, and required actions |
+| **Regulatory Change Engine** | Real-time monitoring of tax, customs, investment, EAC trade, data protection, and labor updates across Uganda, Kenya, Rwanda, and Tanzania with source URLs, impact summaries, and required actions |
 | **Market Entry Playbooks** | Generates registration, tax, import, permit, and compliance checklists by industry and country |
 | **Vendor Due Diligence** | Local supplier profiles with verification, risk scores, contract/payment history, red flags |
 | **Economic Intelligence** | World Bank, central bank, FX, and trade indicators with country risk snapshots |
 | **Proof-Based AI Assistant** | Answers only with cited evidence — no unsupported claims |
+
+## Real-Time Legal Monitoring
+
+The system monitors **22 legal sources** across **4 countries** with automated ingestion and alerting:
+
+### Monitored Countries & Sources
+
+**🇺🇬 Uganda (7 sources)**
+- Uganda Revenue Authority (Tax)
+- Uganda Investment Authority (Investment)
+- Uganda Law Reform Commission (Legal Reform)
+- Parliament of Uganda (Legislation)
+- Uganda Legal Information Institute (Judiciary)
+- Uganda Gazette (Official Legal Notices)
+- Ministry of Justice Uganda (Legal Policy)
+
+**🇰🇪 Kenya (5 sources)**
+- Kenya Revenue Authority (Tax)
+- Kenya Law Reform Commission (Legal Reform)
+- Parliament of Kenya (Legislation)
+- Kenya Law (Judiciary)
+- Kenya Gazette (Official Legal Notices)
+
+**🇷🇼 Rwanda (6 sources)**
+- Rwanda Revenue Authority (Tax)
+- Rwanda Law Reform Commission (Legal Reform)
+- Parliament of Rwanda (Legislation)
+- Rwanda Judiciary (Court Judgments)
+- Rwanda Gazette (Official Legal Notices)
+- Rwanda Ministry of Justice (Legal Policy)
+
+**🇹🇿 Tanzania (1 source)**
+- Tanzania Revenue Authority (Tax)
+
+### Monitoring Schedule
+
+| Task | Frequency | Description |
+|------|-----------|-------------|
+| Legal Sources Monitoring | Every 30 min | High-frequency monitoring of legal sources for UG, KE, RW |
+| Gazette Monitoring | Daily (9-11 AM) | Official gazette monitoring (UG: 9 AM, KE: 10 AM, RW: 11 AM) |
+| Regulatory Changes | Every 2 hours | All regulatory sources across countries |
+| Economic Indicators | Every 6 hours | World Bank and economic data updates |
+| Health Check | Daily (Midnight) | System cleanup and maintenance |
+
+### Advanced Features
+
+- **PDF Document Processing**: Automated text extraction from legal gazettes and court documents
+- **Change Detection**: AI-powered analysis of legislative amendments, numeric changes, and date modifications
+- **Risk Assessment**: Automatic risk level adjustment based on content analysis and urgency factors
+- **Smart Alerting**: High-priority notifications for gazette notices and critical changes
+- **Related Changes**: Identification of related regulatory changes across sources
+- **Stakeholder Impact**: Assessment of operational, financial, legal, HR, and IT impacts
 
 ## Stack
 
@@ -21,6 +73,7 @@ Independent developer project: an AI-powered market-entry, compliance, trade, an
 - **Database:** PostgreSQL (SQLite for local dev without Docker)
 - **Workers:** Celery + Redis
 - **Deploy:** Docker Compose (Railway-ready)
+- **PDF Processing:** PyPDF2 for legal document extraction
 
 ## Quick start
 
@@ -109,6 +162,25 @@ Production-style (gunicorn, UI on port 80):
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 ```
 
+### Starting Real-Time Monitoring
+
+To activate the automated legal monitoring system:
+
+```bash
+# Terminal 1: Start Redis
+redis-server
+
+# Terminal 2: Start Celery worker
+cd backend
+celery -A config.celery worker -l info
+
+# Terminal 3: Start Celery Beat scheduler
+cd backend
+celery -A config.celery beat -l info
+```
+
+The system will automatically monitor all legal sources according to the schedule and send alerts when changes are detected.
+
 ## API endpoints
 
 | Path | Description |
@@ -129,6 +201,8 @@ flowchart LR
     RSS[RSS / Portals]
     APIs[World Bank / IMF]
     Scrapers[Tax and Customs Scrapers]
+    PDF[PDF Document Processing]
+    Legal[Legal Sources Monitoring]
   end
 
   subgraph backend [Django API]
@@ -137,6 +211,7 @@ flowchart LR
     Vendors[Vendor DD]
     Intel[Economic Intel]
     Assistant[RAG Assistant]
+    Change[Change Detection]
   end
 
   subgraph storage [Storage]
@@ -158,12 +233,17 @@ flowchart LR
 
 ### Phase 2
 
+- **Real-time legal monitoring** — High-frequency monitoring (every 30 min) of legal sources across Uganda, Kenya, Rwanda
+- **Multi-country legal sources** — 22 sources covering tax authorities, law reform commissions, parliaments, judiciaries, gazettes, and justice ministries
+- **PDF document processing** — Automated text extraction from legal gazettes and court documents using PyPDF2
+- **Advanced change detection** — AI-powered analysis of legislative amendments, numeric changes, and risk assessment
+- **Intelligent alerting** — High-priority notifications for gazette notices and critical regulatory changes
 - **Ingestion workers** — RSS, HTML list scrapers, World Bank API sync
 - **Evidence indexing** — All ingested content indexed for assistant retrieval
 - **Playbook engine** — Industry/country rule templates enriched with evidence
 - **Scored retrieval** — Assistant uses ranked evidence search with citations
 - **Change alerts** — Email + webhook on new `RegulatoryChange` records
-- **Celery Beat** — Scheduled ingestion every 6h (regulatory) and daily (economic)
+- **Celery Beat** — Scheduled ingestion with country-specific monitoring schedules
 
 Run ingestion manually:
 
@@ -172,6 +252,12 @@ cd backend
 python manage.py ingest --target all
 python manage.py ingest --target economic
 python manage.py ingest --target regulatory
+```
+
+Test legal sources configuration:
+
+```bash
+python manage.py test_all_regions_config
 ```
 
 ### Phase 3
@@ -246,7 +332,7 @@ python manage.py ingest --target regulatory
 
 - **Assistant deep links** — `/assistant?q=...&country=UG` prefills questions from Trade and Regulatory pages
 - **Trade export** — download procedure checklists as Markdown
-- **Cross-module actions** — “Ask assistant” on regulatory changes and trade procedures
+- **Cross-module actions** — "Ask assistant" on regulatory changes and trade procedures
 - **Playbook delete** — `DELETE /api/v1/playbooks/{id}/` + UI remove button
 - **Overview feed** — latest five regulatory changes on the dashboard
 
