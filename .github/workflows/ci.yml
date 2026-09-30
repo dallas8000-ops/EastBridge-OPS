@@ -12,9 +12,9 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
@@ -28,14 +28,14 @@ jobs:
       - name: Django system check
         working-directory: backend
         env:
-          SECRET_KEY: ci-test-secret
+          SECRET_KEY: ci-only-not-a-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           DATABASE_URL: ""
         run: python manage.py check
 
       - name: Migration smoke test
         working-directory: backend
         env:
-          SECRET_KEY: ci-test-secret
+          SECRET_KEY: ci-only-not-a-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           DATABASE_URL: ""
         run: |
           python manage.py makemigrations --check --dry-run
@@ -44,7 +44,7 @@ jobs:
       - name: Run full test suite with coverage report
         working-directory: backend
         env:
-          SECRET_KEY: ci-test-secret
+          SECRET_KEY: ci-only-not-a-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           DATABASE_URL: ""
           EMBEDDING_PROVIDER: hash
         run: |
@@ -55,9 +55,9 @@ jobs:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
@@ -71,7 +71,7 @@ jobs:
       - name: Run strict backend gate
         working-directory: backend
         env:
-          SECRET_KEY: ci-test-secret
+          SECRET_KEY: ci-only-not-a-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           DATABASE_URL: ""
           EMBEDDING_PROVIDER: hash
         run: |
@@ -81,9 +81,9 @@ jobs:
   fixtures:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
@@ -95,7 +95,7 @@ jobs:
       - name: Verify committed fixtures match app image
         working-directory: backend
         env:
-          SECRET_KEY: ci-test-secret
+          SECRET_KEY: ci-only-not-a-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           DATABASE_URL: ""
           EMBEDDING_PROVIDER: hash
         run: python manage.py export_app_data --check
@@ -103,7 +103,7 @@ jobs:
       - name: Load fixtures and verify dataset
         working-directory: backend
         env:
-          SECRET_KEY: ci-test-secret
+          SECRET_KEY: ci-only-not-a-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           DATABASE_URL: ""
         run: |
           python manage.py migrate --noinput
@@ -113,11 +113,11 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
