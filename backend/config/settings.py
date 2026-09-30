@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
@@ -19,7 +20,8 @@ sentry_sdk.init(
     environment=os.environ.get("SENTRY_ENVIRONMENT", "production"),
 )
 
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-only-change-me")
+_INSECURE_DEV_SECRET_KEY = "django-insecure-dev-only-change-me"
+SECRET_KEY = os.getenv("SECRET_KEY", _INSECURE_DEV_SECRET_KEY)
 DEBUG = os.getenv("DEBUG", "False" if any(os.getenv(k, "").strip() for k in ("RAILWAY_ENVIRONMENT", "RAILWAY_PUBLIC_DOMAIN", "RAILWAY_SERVICE_ID", "RAILWAY_PROJECT_ID")) else "True").lower() in ("true", "1", "yes")
 
 _allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
@@ -50,6 +52,18 @@ if _on_railway:
         if _railway_host not in _allowed_hosts:
             _allowed_hosts.append(_railway_host)
 ALLOWED_HOSTS = _allowed_hosts
+
+# SECRET_KEY signs sessions, password-reset tokens and (via simplejwt) every
+# access/refresh JWT. The dev fallback above is public in this repo, so any
+# non-debug or Railway process must refuse to boot without a real key.
+# 50 chars matches Django's own security.W009 threshold.
+if (_on_railway or not DEBUG) and (
+    SECRET_KEY == _INSECURE_DEV_SECRET_KEY or len(SECRET_KEY) < 50
+):
+    raise ImproperlyConfigured(
+        "SECRET_KEY is missing, the public dev default, or shorter than 50 "
+        "characters. Set a strong random SECRET_KEY in the environment."
+    )
 
 INSTALLED_APPS = [
     "django.contrib.admin",
