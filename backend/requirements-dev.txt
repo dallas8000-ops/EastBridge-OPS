@@ -1,0 +1,3 @@
+# Test/CI-only tooling. Kept out of requirements.txt so it never ships in the production image.
+-r requirements.txt
+coverage>=7.6,<8

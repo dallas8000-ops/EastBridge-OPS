@@ -245,20 +245,23 @@ class EmbeddingsUnitTests(TestCase):
 		response.json.return_value = {"data": [{"embedding": [0.2, 0.8]}]}
 		post.return_value = response
 
+		# All scenarios must run with a valid key configured; otherwise _embed_openai
+		# fails at the key guard (ValueError) before the mocked transport is reached,
+		# and the test silently depends on the developer's local .env.
 		with self.settings(OPENAI_API_KEY="sk-valid-key-1234567890", OPENAI_EMBEDDING_MODEL="text-embedding-3-small"):
 			vec, provider, model = embeddings.embed_text("hello", provider="openai")
-		self.assertEqual(vec, [0.2, 0.8])
-		self.assertEqual(provider, "openai")
-		self.assertEqual(model, "text-embedding-3-small")
+			self.assertEqual(vec, [0.2, 0.8])
+			self.assertEqual(provider, "openai")
+			self.assertEqual(model, "text-embedding-3-small")
 
-		post.side_effect = RuntimeError("down")
-		vec2, provider2, model2 = embeddings.embed_text("hello", provider="openai", allow_fallback=True)
-		self.assertEqual(provider2, "hash")
-		self.assertEqual(model2, "hash-v1")
-		self.assertEqual(len(vec2), embeddings.EMBEDDING_DIM)
+			post.side_effect = RuntimeError("down")
+			vec2, provider2, model2 = embeddings.embed_text("hello", provider="openai", allow_fallback=True)
+			self.assertEqual(provider2, "hash")
+			self.assertEqual(model2, "hash-v1")
+			self.assertEqual(len(vec2), embeddings.EMBEDDING_DIM)
 
-		with self.assertRaises(RuntimeError):
-			embeddings.embed_text("hello", provider="openai", allow_fallback=False)
+			with self.assertRaises(RuntimeError):
+				embeddings.embed_text("hello", provider="openai", allow_fallback=False)
 
 	@mock.patch("assistant.embeddings._embed_fastembed", return_value=[0.6, 0.8])
 	def test_embed_text_fastembed_provider_and_model_name(self, _embed_fastembed):
