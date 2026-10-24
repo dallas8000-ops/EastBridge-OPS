@@ -860,3 +860,28 @@ class SubstantiveItemFilterTests(TestCase):
 		self.assertEqual(result["skipped_low_quality"], 1)
 		self.assertEqual(result["indexed"], 1)
 		self.assertEqual(EvidenceDocument.objects.count(), 1)
+
+
+class BestExcerptNavigationTests(TestCase):
+	PAGE = (
+		"Domestic Taxes\nGet a TIN\nEFRIS\nTax Incentives\nFile a Return\nMake a Payment\nGet a Refund\n"
+		"Choose a Tax Agent\nCustoms Audits and Refunds\nLaws, Acts & Regulations\n" * 3
+		+ "Tax Refund\n"
+		"A tax refund is the difference between taxes paid and taxes owed.\n"
+		"Who qualifies for a refund?\n"
+		"– ALL COMPLIANT TAXPAYERS.\n"
+		"What are the Circumstances under which VAT is refundable ?\n"
+		"• When input tax is greater than output tax\n"
+		"• When a tax payer pays more than what is supposed to be paid.\n"
+		+ "Footer link\n" * 40
+	)
+
+	def test_skips_site_menu_and_lands_on_refund_rules(self):
+		excerpt = retrieval.best_excerpt(self.PAGE, ["tax", "refund", "uganda"], max_len=400)
+		self.assertIn("Who qualifies for a refund?", excerpt)
+		self.assertIn("input tax is greater than output tax", excerpt)
+		self.assertNotIn("Get a TIN", excerpt)
+
+	def test_menu_only_page_falls_back_to_raw_text(self):
+		menu = "Home\nAbout\nContact\n" * 100
+		self.assertEqual(retrieval.best_excerpt(menu, ["tax"], max_len=60), menu[:60].strip())
