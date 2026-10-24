@@ -97,11 +97,105 @@
   },
   {
     "fields": {
+      "country": 1,
+      "feed_url": "http://www.ulrc.go.ug/blog/",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "http://www.ulrc.go.ug/blog/",
+        "max_items": 10,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Uganda Law Reform Commission",
+      "source_type": "legal_reform",
+      "url": "http://ulrc.go.ug/"
+    },
+    "model": "core.datasource",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "country": 1,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.parliament.go.ug/hansards",
+        "max_items": 12,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Parliament of Uganda",
+      "source_type": "parliament",
+      "url": "https://www.parliament.go.ug/"
+    },
+    "model": "core.datasource",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "country": 1,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://ulii.org/en/judgments/",
+        "max_items": 15,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Uganda Legal Information Institute",
+      "source_type": "judiciary",
+      "url": "https://ulii.org/"
+    },
+    "model": "core.datasource",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "country": 1,
+      "feed_url": "",
+      "ingestion_config": {
+        "list_url": "https://www.uppc.go.ug/egazettes",
+        "max_items": 10,
+        "type": "gazette"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Uganda Gazette",
+      "source_type": "gazette",
+      "url": "https://www.uppc.go.ug/egazettes"
+    },
+    "model": "core.datasource",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "country": 1,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://justice.go.ug/",
+        "max_items": 8,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Ministry of Justice Uganda",
+      "source_type": "justice_ministry",
+      "url": "https://justice.go.ug/"
+    },
+    "model": "core.datasource",
+    "pk": 7
+  },
+  {
+    "fields": {
       "country": 2,
       "feed_url": "",
       "ingestion_config": {
         "link_selector": "a",
-        "list_url": "https://www.kra.go.ke/en/media-center/public-notices",
+        "list_url": "https://www.kra.go.ke/",
         "max_items": 8,
         "type": "html_list"
       },
@@ -112,7 +206,83 @@
       "url": "https://www.kra.go.ke/"
     },
     "model": "core.datasource",
-    "pk": 3
+    "pk": 8
+  },
+  {
+    "fields": {
+      "country": 2,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://klrc.go.ke/index.php/bills",
+        "max_items": 10,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Kenya Law Reform Commission",
+      "source_type": "legal_reform",
+      "url": "https://klrc.go.ke/"
+    },
+    "model": "core.datasource",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "country": 2,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://parliament.go.ke/the-national-assembly/house-business/bills",
+        "max_items": 12,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Parliament of Kenya",
+      "source_type": "parliament",
+      "url": "https://www.parliament.go.ke/"
+    },
+    "model": "core.datasource",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "country": 2,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://kenyalaw.org/kl/index.php?id=87",
+        "max_items": 15,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Kenya Law (Judiciary)",
+      "source_type": "judiciary",
+      "url": "https://kenyalaw.org/"
+    },
+    "model": "core.datasource",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "country": 2,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://new.kenyalaw.org/gazettes/ke/",
+        "max_items": 10,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Kenya Gazette",
+      "source_type": "gazette",
+      "url": "https://www.governmentpress.go.ke/the-kenya-gazette-"
+    },
+    "model": "core.datasource",
+    "pk": 12
   },
   {
     "fields": {
@@ -129,7 +299,7 @@
       "url": "https://www.eac.int/"
     },
     "model": "core.datasource",
-    "pk": 4
+    "pk": 13
   },
   {
     "fields": {
@@ -146,7 +316,7 @@
       "url": "https://blogs.worldbank.org/opendata/"
     },
     "model": "core.datasource",
-    "pk": 5
+    "pk": 14
   },
   {
     "fields": {
@@ -162,7 +332,7 @@
       "url": "https://data.worldbank.org/"
     },
     "model": "core.datasource",
-    "pk": 6
+    "pk": 15
   },
   {
     "fields": {
@@ -181,7 +351,7 @@
       "url": "https://www.tra.go.tz/"
     },
     "model": "core.datasource",
-    "pk": 7
+    "pk": 16
   },
   {
     "fields": {
@@ -200,7 +370,102 @@
       "url": "https://www.rra.gov.rw/"
     },
     "model": "core.datasource",
-    "pk": 8
+    "pk": 17
+  },
+  {
+    "fields": {
+      "country": 4,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.rlrc.gov.rw/",
+        "max_items": 10,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Rwanda Law Reform Commission",
+      "source_type": "legal_reform",
+      "url": "https://www.rlrc.gov.rw/"
+    },
+    "model": "core.datasource",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "country": 4,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://www.parliament.gov.rw/parliament/our-mandate/bills-and-laws",
+        "max_items": 12,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Parliament of Rwanda",
+      "source_type": "parliament",
+      "url": "https://www.parliament.gov.rw/"
+    },
+    "model": "core.datasource",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "country": 4,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://amategeko.gov.rw/",
+        "max_items": 15,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Rwanda Judiciary",
+      "source_type": "judiciary",
+      "url": "https://www.judiciary.gov.rw/"
+    },
+    "model": "core.datasource",
+    "pk": 20
+  },
+  {
+    "fields": {
+      "country": 4,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://rwandalii.org/",
+        "max_items": 10,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Rwanda Gazette",
+      "source_type": "gazette",
+      "url": "https://rwandalii.org/"
+    },
+    "model": "core.datasource",
+    "pk": 21
+  },
+  {
+    "fields": {
+      "country": 4,
+      "feed_url": "",
+      "ingestion_config": {
+        "link_selector": "a",
+        "list_url": "https://minijust.gov.rw/",
+        "max_items": 8,
+        "type": "html_list"
+      },
+      "is_active": true,
+      "last_checked_at": null,
+      "name": "Rwanda Ministry of Justice",
+      "source_type": "justice_ministry",
+      "url": "https://minijust.gov.rw/"
+    },
+    "model": "core.datasource",
+    "pk": 22
   },
   {
     "fields": {
