@@ -32,6 +32,11 @@ class DataSource(models.Model):
         WORLD_BANK = "world_bank", "World Bank"
         IMF = "imf", "IMF"
         RSS = "rss", "RSS Feed"
+        LEGAL_REFORM = "legal_reform", "Legal Reform Commission"
+        PARLIAMENT = "parliament", "Parliament"
+        JUDICIARY = "judiciary", "Judiciary"
+        GAZETTE = "gazette", "Government Gazette"
+        JUSTICE_MINISTRY = "justice_ministry", "Ministry of Justice"
         OTHER = "other", "Other"
 
     name = models.CharField(max_length=255)

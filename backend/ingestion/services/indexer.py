@@ -5,6 +5,7 @@ from django.utils import timezone
 from assistant.models import EvidenceDocument
 from core.models import DataSource
 from ingestion.fetchers.base import FetchedItem, content_hash
+from ingestion.fetchers.pdf import PDF_LINK_SELECTOR, fetch_gazette_notices, fetch_pdf_list
 from ingestion.fetchers.rss import fetch_html_list, fetch_rss
 from ingestion.fetchers.world_bank import fetch_world_bank_as_items
 from ingestion.models import IngestedItem, IngestionRun
@@ -21,6 +22,11 @@ SOURCE_TYPE_TO_CATEGORY = {
     DataSource.SourceType.LABOR: RegulatoryChange.Category.LABOR,
     DataSource.SourceType.TRADE_PORTAL: RegulatoryChange.Category.CUSTOMS,
     DataSource.SourceType.RSS: RegulatoryChange.Category.OTHER,
+    DataSource.SourceType.LEGAL_REFORM: RegulatoryChange.Category.OTHER,
+    DataSource.SourceType.PARLIAMENT: RegulatoryChange.Category.OTHER,
+    DataSource.SourceType.JUDICIARY: RegulatoryChange.Category.OTHER,
+    DataSource.SourceType.GAZETTE: RegulatoryChange.Category.OTHER,
+    DataSource.SourceType.JUSTICE_MINISTRY: RegulatoryChange.Category.OTHER,
 }
 
 
@@ -63,6 +69,20 @@ def fetch_from_source(source: DataSource) -> list[FetchedItem]:
             link_selector=config.get("link_selector", "article a, .news-item a, h3 a, h2 a"),
             max_items=config.get("max_items", 15),
             base_url=config.get("base_url", source.url),
+        )
+
+    if ingest_type == "pdf_list":
+        return fetch_pdf_list(
+            list_url=config.get("list_url", source.url),
+            pdf_link_selector=config.get("pdf_link_selector", PDF_LINK_SELECTOR),
+            max_items=config.get("max_items", 10),
+            base_url=config.get("base_url", source.url),
+        )
+
+    if ingest_type == "gazette":
+        return fetch_gazette_notices(
+            gazette_url=config.get("list_url", source.url),
+            max_items=config.get("max_items", 10),
         )
 
     if ingest_type == "world_bank_profile":
@@ -136,10 +156,20 @@ def process_fetched_item(source: DataSource, item: FetchedItem) -> IngestedItem:
         DataSource.SourceType.LABOR,
         DataSource.SourceType.TRADE_PORTAL,
         DataSource.SourceType.RSS,
+        DataSource.SourceType.LEGAL_REFORM,
+        DataSource.SourceType.PARLIAMENT,
+        DataSource.SourceType.JUDICIARY,
+        DataSource.SourceType.GAZETTE,
+        DataSource.SourceType.JUSTICE_MINISTRY,
     )
 
     if is_regulatory and source.country:
         summary, impact, action = _summarize_impact(item.title, item.content)
+        risk_level = _infer_risk_level(item.title, item.content)
+        if source.source_type == DataSource.SourceType.GAZETTE:
+            # Official gazette notices are high priority by default. Set before the
+            # first save so the post_save alert carries the final risk level.
+            risk_level = RegulatoryChange.RiskLevel.HIGH
         change, _ = RegulatoryChange.objects.update_or_create(
             source_url=item.url,
             defaults={
@@ -148,7 +178,7 @@ def process_fetched_item(source: DataSource, item: FetchedItem) -> IngestedItem:
                 "business_impact": impact,
                 "required_action": action,
                 "category": category,
-                "risk_level": _infer_risk_level(item.title, item.content),
+                "risk_level": risk_level,
                 "source": source,
                 "country": source.country,
                 "published_at": item.published_at,
@@ -161,12 +191,41 @@ def process_fetched_item(source: DataSource, item: FetchedItem) -> IngestedItem:
     return ingested
 
 
+MIN_EVIDENCE_CHARS = 300
+
+NAVIGATION_TITLE_PREFIXES = (
+    "skip to",
+    "advanced search",
+    "help",
+    "login",
+    "log in",
+    "sign in",
+    "contact us",
+)
+
+
+def is_substantive_item(item: FetchedItem) -> bool:
+    """Reject navigation links, contact links and near-empty pages scraped from list pages."""
+    url = (item.url or "").strip()
+    if not url.lower().startswith(("http://", "https://")):
+        return False
+    if "#" in url or "api.whatsapp.com" in url:
+        return False
+    title = " ".join((item.title or "").split()).lower()
+    if not title or title.startswith(NAVIGATION_TITLE_PREFIXES):
+        return False
+    return len((item.content or "").strip()) >= MIN_EVIDENCE_CHARS
+
+
 def run_source_ingestion(source: DataSource) -> dict:
     try:
         items = fetch_from_source(source)
     except Exception as exc:
         logger.exception("Ingestion failed for %s", source.name)
         return {"source": source.name, "error": str(exc), "new": 0}
+
+    fetched_count = len(items)
+    items = [item for item in items if is_substantive_item(item)]
 
     new_count = 0
     failed = 0
@@ -195,7 +254,8 @@ def run_source_ingestion(source: DataSource) -> dict:
     source.save(update_fields=["last_checked_at"])
     return {
         "source": source.name,
-        "fetched": len(items),
+        "fetched": fetched_count,
+        "skipped_low_quality": fetched_count - len(items),
         "indexed": new_count,
         "failed": failed,
     }

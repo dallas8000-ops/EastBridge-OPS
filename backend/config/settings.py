@@ -252,11 +252,40 @@ from celery.schedules import crontab  # noqa: E402
 CELERY_BEAT_SCHEDULE = {
     "ingest-regulatory-sources": {
         "task": "ingestion.tasks.run_regulatory_ingestion",
-        "schedule": crontab(minute=0, hour="*/6"),
+        "schedule": crontab(minute=0, hour="*/2"),
     },
     "sync-economic-indicators": {
         "task": "ingestion.tasks.run_economic_ingestion",
-        "schedule": crontab(minute=30, hour="2"),
+        "schedule": crontab(minute=30, hour="*/6"),
+    },
+    # High-frequency monitoring of legal sources (alerts on new changes)
+    "monitor-uganda-legal-sources": {
+        "task": "ingestion.tasks.monitor_uganda_legal_sources",
+        "schedule": crontab(minute="*/30"),
+    },
+    "monitor-kenya-legal-sources": {
+        "task": "ingestion.tasks.monitor_kenya_legal_sources",
+        "schedule": crontab(minute="*/30"),
+    },
+    "monitor-rwanda-legal-sources": {
+        "task": "ingestion.tasks.monitor_rwanda_legal_sources",
+        "schedule": crontab(minute="*/30"),
+    },
+    "monitor-uganda-gazette": {
+        "task": "ingestion.tasks.monitor_uganda_gazette",
+        "schedule": crontab(minute=0, hour="9"),
+    },
+    "monitor-kenya-gazette": {
+        "task": "ingestion.tasks.monitor_kenya_gazette",
+        "schedule": crontab(minute=0, hour="10"),
+    },
+    "monitor-rwanda-gazette": {
+        "task": "ingestion.tasks.monitor_rwanda_gazette",
+        "schedule": crontab(minute=0, hour="11"),
+    },
+    "daily-health-check": {
+        "task": "ingestion.tasks.daily_health_check",
+        "schedule": crontab(minute=0, hour="0"),
     },
     "sync-trade-procedures": {
         "task": "trade.tasks.sync_trade_procedures_task",
