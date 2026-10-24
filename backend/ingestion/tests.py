@@ -73,7 +73,7 @@ class IngestionPipelineTests(TestCase):
 	@mock.patch("ingestion.services.indexer.process_fetched_item")
 	@mock.patch("ingestion.services.indexer.fetch_from_source")
 	def test_run_source_ingestion_marks_failed_items(self, fetch_from_source, process_fetched_item):
-		fetch_from_source.return_value = [self._item(external_id="x-fail")]
+		fetch_from_source.return_value = [self._item(external_id="x-fail", content="urgent tax deadline " * 20)]
 		process_fetched_item.side_effect = RuntimeError("boom")
 
 		result = indexer.run_source_ingestion(self.source)
@@ -827,3 +827,36 @@ class RetrievalServiceTests(TestCase):
 		excerpt = retrieval.best_excerpt(content, ["import"], max_len=140)
 		self.assertEqual(len(excerpt), 140)
 		self.assertIn("import", excerpt.lower())
+
+
+class SubstantiveItemFilterTests(TestCase):
+	def _item(self, title="Stamp Duty", url="https://ura.go.ug/en/domestic-taxes/stamp-duty/", content="x" * 400):
+		return FetchedItem(external_id=url, title=title, url=url, content=content)
+
+	def test_accepts_full_government_page(self):
+		self.assertTrue(indexer.is_substantive_item(self._item()))
+
+	def test_rejects_contact_and_anchor_links(self):
+		self.assertFalse(indexer.is_substantive_item(self._item(url="mailto:ulrc@ulrc.go.ug")))
+		self.assertFalse(indexer.is_substantive_item(self._item(url="https://api.whatsapp.com/send?phone=250739008010")))
+		self.assertFalse(indexer.is_substantive_item(self._item(url="https://rwandalii.org/#header-search")))
+
+	def test_rejects_navigation_titles_and_thin_pages(self):
+		self.assertFalse(indexer.is_substantive_item(self._item(title="Skip to main menu")))
+		self.assertFalse(indexer.is_substantive_item(self._item(content="Regulation governing Trust")))
+
+	def test_run_source_ingestion_skips_low_quality_items(self):
+		country = Country.objects.create(code="UG", name="Uganda", is_eac_member=True)
+		source = DataSource.objects.create(
+			name="URA",
+			url="https://ura.go.ug",
+			source_type=DataSource.SourceType.TAX_AUTHORITY,
+			country=country,
+		)
+		items = [self._item(), self._item(title="Commissioners", url="http://ulrc.go.ug/commissioners/", content="")]
+		with mock.patch.object(indexer, "fetch_from_source", return_value=items):
+			result = indexer.run_source_ingestion(source)
+		self.assertEqual(result["fetched"], 2)
+		self.assertEqual(result["skipped_low_quality"], 1)
+		self.assertEqual(result["indexed"], 1)
+		self.assertEqual(EvidenceDocument.objects.count(), 1)
