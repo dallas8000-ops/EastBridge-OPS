@@ -1,5 +1,5 @@
 {
-  "productionUrl": "https://eastbridge-ops-production.up.railway.app",
+  "productionUrl": "https://eastbridge.gilliomfrontlinedigital.com",
   "environments": {
     "test": {
       "url": ""
