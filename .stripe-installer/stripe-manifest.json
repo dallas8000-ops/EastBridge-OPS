@@ -1,7 +1,7 @@
 {
   "createdAt": "2026-07-05T06:16:30.043623+00:00",
-  "updatedAt": "2026-07-05T06:50:42.125496+00:00",
-  "accountId": null,
+  "updatedAt": "2026-10-02T15:10:39.904871+00:00",
+  "accountId": "acct_1TVQpaRxznXvj6jh",
   "products": [
     {
       "id": "prod_UgdnrglonWJRHJ",
@@ -57,10 +57,13 @@
     }
   ],
   "webhookEndpoint": {
-    "id": "we_1TpjszRxznXvj6jhwQJxVhzA",
+    "id": "we_1UM86dRxznXvj6jhmkkNDUKz",
     "url": "https://eastbridge-ops-production.up.railway.app/stripe/webhook",
     "reused": false
   },
-  "billingPortalConfig": null,
+  "billingPortalConfig": {
+    "id": "bpc_1UM2dDRxznXvj6jhJfaJhO4b",
+    "reused": true
+  },
   "appUrl": "https://eastbridge-ops-production.up.railway.app"
 }
