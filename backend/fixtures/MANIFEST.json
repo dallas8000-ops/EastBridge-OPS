@@ -9,8 +9,8 @@
         "core.datasource",
         "playbooks.industry"
       ],
-      "records": 19,
-      "sha256": "74808b40f758c5a668f856f1de2a6b182ee9d261d3ac23029f1b31298bd775e0"
+      "records": 33,
+      "sha256": "4769808548674414a435be36d4fa784bcf053f280e079664136bd4e15042d1df"
     },
     {
       "file": "initial_02_accounts.json",
@@ -39,7 +39,7 @@
         "regulatory.changealertsubscription"
       ],
       "records": 4,
-      "sha256": "a9f5a78bd4fbedbfcaa83c62b1be3b764f0453c6ff5034bd61a73a1bcc183a4a"
+      "sha256": "445c73d57b75d82d9c9cb4e12aaf1972c2a83a1d4a27de00eed88018b5e401f7"
     },
     {
       "file": "initial_05_intelligence.json",
@@ -48,7 +48,7 @@
         "intelligence.countryrisksnapshot"
       ],
       "records": 5,
-      "sha256": "8605d56d360db3719693ff19fd8aaaa1d42f321c2d13e2e7c7bc70e421882b4f"
+      "sha256": "5d4d5ac27af8c703597fb63c752cbaa204adb7b1dca3494096ba816a39841638"
     },
     {
       "file": "initial_06_trade.json",

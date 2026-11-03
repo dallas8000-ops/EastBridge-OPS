@@ -49,7 +49,7 @@
       "published_at": "2026-02-10",
       "required_action": "Review bill of lading and commercial invoice HS codes with your customs broker before shipment arrival at Mombasa.",
       "risk_level": "high",
-      "source": 3,
+      "source": 8,
       "source_url": "https://www.kra.go.ke/offline-sample/kra-solar-hs-2026",
       "summary": "Kenya Revenue Authority published guidance on classification and documentation for photovoltaic modules and inverters under updated HS headings.",
       "title": "KRA customs declaration update for solar equipment HS codes"

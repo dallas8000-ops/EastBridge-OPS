@@ -191,12 +191,41 @@ def process_fetched_item(source: DataSource, item: FetchedItem) -> IngestedItem:
     return ingested
 
 
+MIN_EVIDENCE_CHARS = 300
+
+NAVIGATION_TITLE_PREFIXES = (
+    "skip to",
+    "advanced search",
+    "help",
+    "login",
+    "log in",
+    "sign in",
+    "contact us",
+)
+
+
+def is_substantive_item(item: FetchedItem) -> bool:
+    """Reject navigation links, contact links and near-empty pages scraped from list pages."""
+    url = (item.url or "").strip()
+    if not url.lower().startswith(("http://", "https://")):
+        return False
+    if "#" in url or "api.whatsapp.com" in url:
+        return False
+    title = " ".join((item.title or "").split()).lower()
+    if not title or title.startswith(NAVIGATION_TITLE_PREFIXES):
+        return False
+    return len((item.content or "").strip()) >= MIN_EVIDENCE_CHARS
+
+
 def run_source_ingestion(source: DataSource) -> dict:
     try:
         items = fetch_from_source(source)
     except Exception as exc:
         logger.exception("Ingestion failed for %s", source.name)
         return {"source": source.name, "error": str(exc), "new": 0}
+
+    fetched_count = len(items)
+    items = [item for item in items if is_substantive_item(item)]
 
     new_count = 0
     failed = 0
@@ -225,7 +254,8 @@ def run_source_ingestion(source: DataSource) -> dict:
     source.save(update_fields=["last_checked_at"])
     return {
         "source": source.name,
-        "fetched": len(items),
+        "fetched": fetched_count,
+        "skipped_low_quality": fetched_count - len(items),
         "indexed": new_count,
         "failed": failed,
     }

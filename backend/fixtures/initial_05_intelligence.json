@@ -34,7 +34,7 @@
       "indicator_type": "gdp_growth",
       "label": "Real GDP growth",
       "period": "2025-12-31",
-      "source": 6,
+      "source": 15,
       "source_url": "https://data.worldbank.org/offline-sample",
       "unit": "%",
       "value": "5.400000"
@@ -49,7 +49,7 @@
       "indicator_type": "inflation",
       "label": "Consumer price inflation",
       "period": "2025-12-31",
-      "source": 6,
+      "source": 15,
       "source_url": "https://data.worldbank.org/offline-sample",
       "unit": "%",
       "value": "6.800000"
@@ -64,7 +64,7 @@
       "indicator_type": "fx_rate",
       "label": "TZS per EUR (approx.)",
       "period": "2026-01-31",
-      "source": 6,
+      "source": 15,
       "source_url": "https://data.worldbank.org/offline-sample",
       "unit": "TZS/EUR",
       "value": "2750.000000"

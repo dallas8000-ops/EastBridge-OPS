@@ -10,6 +10,8 @@ from ingestion.services.retrieval import best_excerpt, search_evidence, synthesi
 
 from .llm import generate_grounded_answer
 
+CITATION_EXCERPT_CHARS = 1200
+
 from .models import AssistantQuery, Citation
 from .serializers import AskSerializer, AssistantQuerySerializer
 
@@ -70,7 +72,7 @@ class AssistantQueryViewSet(viewsets.ReadOnlyModelViewSet):
             Citation.objects.create(
                 query=query,
                 evidence=doc,
-                excerpt=best_excerpt(doc.content, tokens),
+                excerpt=best_excerpt(doc.content, tokens, max_len=CITATION_EXCERPT_CHARS),
                 relevance_score=_clamp_relevance_score(score),
             )
 

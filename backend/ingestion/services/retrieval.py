@@ -162,18 +162,41 @@ def search_evidence(
     return scored[:limit], method
 
 
+NAV_LINE_MAX_CHARS = 30
+SENTENCE_ENDINGS = (".", ":", "?", ";", "!")
+
+
+def _prose_text(content: str) -> str:
+    """Drop short menu-style lines (site navigation scraped with the page) from excerpt candidates."""
+    lines = [line.strip() for line in content.splitlines()]
+    kept = [line for line in lines if len(line) > NAV_LINE_MAX_CHARS or line.endswith(SENTENCE_ENDINGS)]
+    return "\n".join(kept) if kept else content
+
+
 def best_excerpt(content: str, tokens: list[str], max_len: int = 500) -> str:
     if len(content) <= max_len:
         return content
 
-    lower = content.lower()
+    text = _prose_text(content)
+    if len(text) <= max_len:
+        return text
+
+    # Start the window where the question's terms are densest, not at their first mention.
+    lower = text.lower()
+    best_start, best_hits = None, 0
     for token in tokens:
         idx = lower.find(token)
-        if idx >= 0:
+        while idx >= 0:
             start = max(0, idx - 100)
-            return content[start : start + max_len].strip()
+            window = lower[start : start + max_len]
+            hits = sum(window.count(t) for t in tokens)
+            if hits > best_hits:
+                best_start, best_hits = start, hits
+            idx = lower.find(token, idx + 1)
 
-    return content[:max_len].strip()
+    if best_start is None:
+        return text[:max_len].strip()
+    return text[best_start : best_start + max_len].strip()
 
 
 def synthesize_answer(question: str, matches: list[tuple[EvidenceDocument, Decimal]]) -> str:
